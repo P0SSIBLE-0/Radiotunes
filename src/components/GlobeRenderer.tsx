@@ -4,7 +4,7 @@ import Globe, { type GlobeMethods } from "react-globe.gl";
 import * as THREE from "three";
 import { motion } from "motion/react";
 import { debounce } from "../utils/debounce";
-import type { StationResponse } from "radio-browser-api";
+import type { Station} from "radio-browser-api";
 
 // Define types
 interface FeatureProperties {
@@ -22,7 +22,7 @@ interface GeoJsonFeature {
 
 interface GlobeRendererProps {
   landPolygons: GeoJsonFeature[];
-  currentStation: StationResponse | null;
+  currentStation: Station | null;
   setHoveredPolygon: (polygon: GeoJsonFeature | null) => void;
   onPointClick: (point: any) => void;
   onPointHover: (point: any, event?: MouseEvent) => void;
@@ -116,37 +116,25 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
     }, []);
     
 
-    // Initialize globe settings
-    useEffect(() => {
-      if (globeEl.current) {
-        const controls = globeEl.current.controls();
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.01;
-        controls.enableZoom = true;
-        controls.enablePan = true;
-        controls.enableRotate = true;
-        controls.minDistance = 101;
-        controls.maxDistance = 1000;
-        globeEl.current.pointOfView({ altitude: 2 }, 0);
-      }
-    }, []);
-
     // Focus on current station
     useEffect(() => {
+      console.log("Current station:", currentStation);
       if (
         globeEl.current &&
-        currentStation?.geo_lat != null &&
-        currentStation?.geo_long != null
+        currentStation?.geoLat != null &&
+        currentStation?.geoLong != null
       ) {
         const controls = globeEl.current.controls();
-        controls.autoRotate = false;
+        globeEl.current.camera().position.z = 150;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.02;
         globeEl.current.pointOfView(
           {
-            lat: currentStation.geo_lat,
-            lng: currentStation.geo_long,
-            altitude: 2,
+            lat: currentStation?.geoLat,
+            lng: currentStation?.geoLong,
+            altitude: 1,
           },
-          1500
+          1000
         );
       }
     }, [currentStation]);
@@ -195,12 +183,12 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
     const pointColor = useCallback(
       (point: any) => {
         if (!point) return "#ef4444";
-        if (currentStation?.stationuuid === point.station?.stationuuid)
+        if (currentStation?.id === point.station?.stationuuid)
           return "#3b82f6";
-        if (point.hovered) return "#f59e0b";
+        if (point.hovered) return "#111";
         return "#ef4444";
       },
-      [currentStation?.stationuuid]
+      [currentStation?.id]
     );
 
     return (
@@ -239,9 +227,9 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
               preserveDrawingBuffer: false,
             }}
             pointOfView={{
-              lat: currentStation?.geo_lat,
-              lng: currentStation?.geo_long,
-              altitude: 2,
+              lat: currentStation?.geoLat,
+              lng: currentStation?.geoLong,
+              altitude: 1.5,
             }}
             lineHoverPrecision={1}
             enablePointerInteraction={true}

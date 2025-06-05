@@ -1,6 +1,6 @@
 // src/types/radio.t.ts
 import { Howl } from 'howler';
-import type { StationResponse, Station } from "radio-browser-api";
+import type { StationResponse } from "radio-browser-api";
 
 export interface RadioState {
   // Station state

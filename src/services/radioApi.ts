@@ -10,7 +10,7 @@ api.setBaseUrl("https://fi1.api.radio-browser.info");
 // Helper function to map API station to our Station interface
 const mapApiStation = (s: RadioApiStationFromServer): Station => ({
   changeuuid: s.changeuuid,
-  stationuuid: s.id,
+  id: s.id,
   name: s.name || "Unknown",
   url: s.url || "",
   urlResolved: s.urlResolved || s.url || "",
@@ -18,8 +18,6 @@ const mapApiStation = (s: RadioApiStationFromServer): Station => ({
   favicon: s.favicon || "",
   tags: Array.isArray(s.tags)
     ? s.tags
-    : s.tags
-    ? s.tags.split(",").map((tag) => tag.trim())
     : [],
   country: s.country || "",
   countryCode: s.countryCode || "",
@@ -66,9 +64,9 @@ export async function fetchStations(limit: number = 500): Promise<Station[]> {
 
     // Map to our application's Station interface
     const mappedStations = stationsFromServer.map(
-      (s: RadioApiStationFromServer): Station => {
+      (s: any): Station => {
         return {
-          changeuuid: s.changeuuid,
+          changeId: s.changeuuid,
           stationuuid: s.id,
           name: s.name || "Unknown",
           url: s.url || "",
@@ -113,7 +111,7 @@ export async function fetchStations(limit: number = 500): Promise<Station[]> {
 
     console.log("Mapped stations count:", mappedStations.length);
     return mappedStations;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching stations with radio-browser-api:", error);
     throw new Error(`Failed to fetch stations: ${error.message}`); // Throw error instead of returning []
   }
@@ -164,6 +162,19 @@ export async function recordStationClick(stationUuid: string): Promise<void> {
 //   }
 // };
 
+export const fetchGenres = async (): Promise<string[]> => {
+  console.log("Fetching genres...");
+  try {
+    const tags = await api.getTags();
+
+    // Filter out empty tags and return the names
+    return tags.map((tag) => tag.name.trim()).filter((name) => name.length > 0);
+  } catch (error) {
+    console.error("Error fetching genres:", error);
+    return [];
+  }
+};
+
 export const searchStations = async (query: string): Promise<Station[]> => {
   if (!query.trim()) {
     return fetchStations(50); // Return some default stations if query is empty
@@ -179,7 +190,7 @@ export const searchStations = async (query: string): Promise<Station[]> => {
     });
 
     console.log(`Found ${stations.length} stations for query: "${query}"`);
-    return stations.map(mapApiStation);
+    return stations;
   } catch (error) {
     console.error("Error searching stations:", error);
     throw new Error("Failed to search stations");
