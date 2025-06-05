@@ -1,10 +1,9 @@
-import { useEffect } from 'react'; // Removed unused React import
-import RadioGlobe from './components/RadioGlobe';
+import React, { useEffect } from 'react';
 import Player from './components/Player';
 import SearchStations from './components/SearchStations';
-import Filters from './components/Filters';
-import { useRadioStore } from './store/radioStore'; // Added useRadioStore import
+import { useRadioStore } from './store/radioStore';
 import './App.css';
+const RadioGlobe = React.lazy(() => import('./components/RadioGlobe'));
 
 function App() {
   const fetchAndSetStations = useRadioStore((state) => state.fetchAndSetStations);
@@ -15,7 +14,9 @@ function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-900">
-      <RadioGlobe />
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <RadioGlobe />
+      </React.Suspense>
       <SearchStations />
       {/* <Filters /> */}
       <Player />

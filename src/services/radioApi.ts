@@ -1,111 +1,187 @@
-// Import values and types separately for clarity and to satisfy verbatimModuleSyntax
-import { RadioBrowserApi } from 'radio-browser-api';
-import type { Station as RadioApiStationFromServer } from 'radio-browser-api';
+import { RadioBrowserApi } from "radio-browser-api";
+import type { Station as RadioApiStationFromServer } from "radio-browser-api";
+import type { Station } from "radio-browser-api";
 
 // Initialize the API with a user agent
-const api = new RadioBrowserApi('RadioGlobeApp/1.0');
+const api = new RadioBrowserApi("RadioGlobeApp/1.0");
+//https://api.radio-browser.info/net you can see running server info here.
+api.setBaseUrl("https://fi1.api.radio-browser.info");
 
-// This is the Station interface our application components will use.
-export interface Station {
-  changeuuid: string;
-  stationuuid: string; // Mapped from id
-  name: string;
-  url: string;
-  url_resolved: string; // Mapped from urlResolved
-  homepage: string;
-  favicon: string;
-  tags: string[];
-  country: string;
-  countrycode: string;
-  iso_3166_2: string | null;
-  state: string;
-  language: string[];
-  languagecodes: string[];
-  votes: number;
-  lastchangetime_iso8601: string;
-  codec: string;
-  bitrate: number;
-  hls: boolean;
-  lastcheckok: boolean;
-  lastcheckoktime_iso8601: string;
-  clickcount: number;
-  clicktrend: number;
-  geo_lat?: number | null;
-  geo_long?: number | null;
-}
+// Helper function to map API station to our Station interface
+const mapApiStation = (s: RadioApiStationFromServer): Station => ({
+  changeuuid: s.changeuuid,
+  stationuuid: s.id,
+  name: s.name || "Unknown",
+  url: s.url || "",
+  urlResolved: s.urlResolved || s.url || "",
+  homepage: s.homepage || "",
+  favicon: s.favicon || "",
+  tags: Array.isArray(s.tags)
+    ? s.tags
+    : s.tags
+    ? s.tags.split(",").map((tag) => tag.trim())
+    : [],
+  country: s.country || "",
+  countryCode: s.countryCode || "",
+  state: s.state || "",
+  language: Array.isArray(s.language)
+    ? s.language
+    : s.language
+    ? [s.language]
+    : [],
+  votes: s.votes || 0,
+  lastChangeTime: s.lastChangeTime || new Date(0),
+  codec: s.codec || "",
+  bitrate: s.bitrate || 0,
+  hls: s.hls || false,
+  lastCheckOk: s.lastCheckOk || false,
+  lastCheckTime: s.lastCheckTime || new Date(0),
+  lastCheckOkTime: s.lastCheckOkTime || new Date(0),
+  lastLocalCheckTime: s.lastLocalCheckTime || new Date(0),
+  clickTimestamp: s.clickTimestamp || new Date(0),
+  clickCount: s.clickCount || 0,
+  clickTrend: s.clickTrend || 0,
+  geoLat: s.geoLat ?? null,
+  geoLong: s.geoLong ?? null,
+});
 export async function fetchStations(limit: number = 500): Promise<Station[]> {
-  console.log('Fetching stations using radio-browser-api...');
+  console.log("Fetching stations using radio-browser-api...");
   try {
     // Fetch stations using the library
-    const stationsFromServer: RadioApiStationFromServer[] = await api.searchStations({
-      limit: limit,
-      hasGeoInfo: true,
-      order: 'random',
-      hideBroken: true,
-    });
-    console.log('Raw stations fetched from server:', stationsFromServer.length);
-    console.log('Sample station:', stationsFromServer[0]); // Log sample for debugging
+    const stationsFromServer: RadioApiStationFromServer[] =
+      await api.searchStations({
+        limit: limit,
+        hasGeoInfo: true,
+        order: "random",
+        hideBroken: true,
+      });
+    console.log("Raw stations fetched from server:", stationsFromServer.length);
+    console.log("Sample station:", stationsFromServer[0]); // Log sample for debugging
 
     if (stationsFromServer.length === 0) {
-      console.warn('No stations returned from API. Check filters or API status.');
+      console.warn(
+        "No stations returned from API. Check filters or API status."
+      );
     }
 
     // Map to our application's Station interface
-    const mappedStations = stationsFromServer.map((s: RadioApiStationFromServer): Station => {
-      return {
-        changeuuid: s.changeuuid,
-        stationuuid: s.id,
-        name: s.name || 'Unknown',
-        url: s.url || '',
-        url_resolved: s.urlResolved || s.url || '',
-        homepage: s.homepage || '',
-        favicon: s.favicon || '',
-        tags: Array.isArray(s.tags) ? s.tags : (s.tags ? s.tags.split(',') : []),
-        country: s.country || '',
-        countrycode: s.countryCode || '',
-        iso_3166_2: s.iso_3166_2 ?? null,
-        state: s.state || '',
-        language: Array.isArray(s.language) ? s.language : (s.language ? [s.language] : []),
-        languagecodes: s.languagecodes || [],
-        votes: s.votes || 0,
-        lastchangetime_iso8601: s.lastChangeTime instanceof Date 
-          ? s.lastChangeTime.toISOString() 
-          : (s.lastchangetime_iso8601 || new Date(0).toISOString()),
-        codec: s.codec || '',
-        bitrate: s.bitrate || 0,
-        hls: s.hls || 0,
-        lastcheckok: s.lastCheckOk || false,
-        lastcheckoktime_iso8601: s.lastCheckOkTime instanceof Date 
-          ? s.lastCheckOkTime.toISOString() 
-          : (s.lastcheckoktime_iso8601 || new Date(0).toISOString()),
-        clickcount: s.clickCount || 0,
-        clicktrend: s.clickTrend || 0,
-        geo_lat: s.geoLat ?? undefined,
-        geo_long: s.geoLong ?? undefined,
-      };
-    });
+    const mappedStations = stationsFromServer.map(
+      (s: RadioApiStationFromServer): Station => {
+        return {
+          changeuuid: s.changeuuid,
+          stationuuid: s.id,
+          name: s.name || "Unknown",
+          url: s.url || "",
+          url_resolved: s.urlResolved || s.url || "",
+          homepage: s.homepage || "",
+          favicon: s.favicon || "",
+          tags: Array.isArray(s.tags)
+            ? s.tags
+            : s.tags
+            ? s.tags.split(",")
+            : [],
+          country: s.country || "",
+          countrycode: s.countryCode || "",
+          iso_3166_2: s.iso_3166_2 ?? null,
+          state: s.state || "",
+          language: Array.isArray(s.language)
+            ? s.language
+            : s.language
+            ? [s.language]
+            : [],
+          languagecodes: s.languagecodes || [],
+          votes: s.votes || 0,
+          lastchangetime_iso8601:
+            s.lastChangeTime instanceof Date
+              ? s.lastChangeTime.toISOString()
+              : s.lastchangetime_iso8601 || new Date(0).toISOString(),
+          codec: s.codec || "",
+          bitrate: s.bitrate || 0,
+          hls: s.hls || 0,
+          lastcheckok: s.lastCheckOk || false,
+          lastcheckoktime_iso8601:
+            s.lastCheckOkTime instanceof Date
+              ? s.lastCheckOkTime.toISOString()
+              : s.lastcheckoktime_iso8601 || new Date(0).toISOString(),
+          clickcount: s.clickCount || 0,
+          clicktrend: s.clickTrend || 0,
+          geo_lat: s.geoLat ?? undefined,
+          geo_long: s.geoLong ?? undefined,
+        };
+      }
+    );
 
-    console.log('Mapped stations count:', mappedStations.length);
+    console.log("Mapped stations count:", mappedStations.length);
     return mappedStations;
   } catch (error) {
-    console.error('Error fetching stations with radio-browser-api:', error);
+    console.error("Error fetching stations with radio-browser-api:", error);
     throw new Error(`Failed to fetch stations: ${error.message}`); // Throw error instead of returning []
   }
 }
 
 export async function recordStationClick(stationUuid: string): Promise<void> {
-  console.log(`Recording click for station ${stationUuid} using api.sendStationClick`);
+  console.log(
+    `Recording click for station ${stationUuid} using api.sendStationClick`
+  );
   try {
     const response = await api.sendStationClick(stationUuid);
     if (response && response.ok) {
-      console.log(`Successfully recorded click for station ${stationUuid}: ${response.message}`);
+      console.log(
+        `Successfully recorded click for station ${stationUuid}: ${response.message}`
+      );
     } else {
-      console.error(`Error recording click for station ${stationUuid}:`, response?.message || 'Unknown error from API');
+      console.error(
+        `Error recording click for station ${stationUuid}:`,
+        response?.message || "Unknown error from API"
+      );
     }
   } catch (error) {
-    console.error(`Exception recording click for station ${stationUuid}:`, error);
+    console.error(
+      `Exception recording click for station ${stationUuid}:`,
+      error
+    );
     if (error instanceof Error) {
-        console.error('Error details:', error.message);
+      console.error("Error details:", error.message);
     }
   }
 }
+
+// export const fetchGenres = async (): Promise<string[]> => {
+//   console.log("Fetching genres...");
+//   try {
+//     const tags = await api.getTags({
+//       hideBroken: true,
+//       order: "stationcount",
+//       reverse: true,
+//       limit: 100,
+//     });
+
+//     // Filter out empty tags and return the names
+//     return tags.map((tag) => tag.name.trim()).filter((name) => name.length > 0);
+//   } catch (error) {
+//     console.error("Error fetching genres:", error);
+//     return [];
+//   }
+// };
+
+export const searchStations = async (query: string): Promise<Station[]> => {
+  if (!query.trim()) {
+    return fetchStations(50); // Return some default stations if query is empty
+  }
+
+  console.log(`Searching stations for: "${query}"`);
+  try {
+    const stations = await api.searchStations({
+      name: query,
+      limit: 50,
+      hideBroken: true,
+      hasGeoInfo: true,
+    });
+
+    console.log(`Found ${stations.length} stations for query: "${query}"`);
+    return stations.map(mapApiStation);
+  } catch (error) {
+    console.error("Error searching stations:", error);
+    throw new Error("Failed to search stations");
+  }
+};

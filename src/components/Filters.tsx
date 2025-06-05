@@ -6,7 +6,6 @@ const Filters: React.FC = () => {
   const [activeGenre, setActiveGenre] = useState<string>('All');
 
   const genres = ['All', 'Pop', 'Rock', 'Jazz', 'Electronic', 'Classical', 'Hip Hop', 'Reggae'];
-  // Moods can be added later
 
   return (
     <div className="w-full">
@@ -65,8 +64,3 @@ const Filters: React.FC = () => {
 };
 
 export default Filters;
-
-// Helper style for hiding scrollbar (if needed, Tailwind might have a utility or plugin)
-// Add to your global CSS or a style tag if you prefer:
-// .no-scrollbar::-webkit-scrollbar { display: none; }
-// .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
