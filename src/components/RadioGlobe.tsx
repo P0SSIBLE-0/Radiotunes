@@ -3,10 +3,17 @@ import * as topojson from "topojson-client";
 import { useRadioStore } from "../store/radioStore";
 import Tooltip from "./Tooltip";
 import GlobeRenderer from "./GlobeRenderer";
-// import { Station } from "../services/radioApi";
-import { type Station, type StationResponse } from "radio-browser-api";
-// Define types
-interface GeoJsonFeature extends GeoJSON.Feature<GeoJSON.Geometry, any> {}
+import { type Station } from "../types/radio.t";
+
+// Define types - use a definition compatible with react-globe.gl
+interface GeoJsonFeature {
+  type: string;
+  properties: { [key: string]: any };
+  geometry: {
+    type: string;
+    coordinates: any;
+  };
+}
 
 interface WindowSize {
   width: number;
@@ -27,7 +34,7 @@ const RadioGlobe: React.FC = () => {
   const { stations, currentStation, selectStation, isLoadingStations, play } =
     useRadioStore();
   const [landPolygons, setLandPolygons] = useState<GeoJsonFeature[]>([]);
-  const [hoveredStation, setHoveredStation] = useState<StationResponse | null>(null);
+  const [hoveredStation, setHoveredStation] = useState<Station | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{
     x: number;
     y: number;
@@ -90,12 +97,12 @@ const RadioGlobe: React.FC = () => {
               const countries = topojson.feature(
                 data,
                 data.objects.countries
-              ) as unknown as GeoJsonFeature[];
+              ) as unknown as { features: GeoJsonFeature[] };
               console.log(
                 "Fallback features loaded:",
-                countries.length
+                countries.features.length
               );
-              setLandPolygons(countries);
+              setLandPolygons(countries.features);
             }
           })
           .catch((fallbackErr) =>
@@ -144,11 +151,10 @@ const RadioGlobe: React.FC = () => {
         }
       }
     },
-    [selectStation, play, hoveredStation]
+    [selectStation, play]
   );
 
   // Handle point hover
-  // In RadioGlobe.tsx
   const handlePointHover = React.useCallback(
     (point: any, event?: MouseEvent) => {
       if (point) {
@@ -194,7 +200,7 @@ const RadioGlobe: React.FC = () => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-gray-900">
-      <GlobeRenderer
+       <GlobeRenderer
         landPolygons={landPolygons}
         currentStation={currentStation}
         setHoveredPolygon={setHoveredPolygon}
@@ -202,29 +208,7 @@ const RadioGlobe: React.FC = () => {
         onPointHover={handlePointHover}
         pointsData={globePointsData}
         windowSize={windowSize}
-      >
-        {/* Custom point labels */}
-        {globePointsData.map((point) => (
-          <div
-            key={`${point.lat}-${point.lng}-${point.station.stationuuid}`}
-            style={{
-              position: "absolute",
-              transform: "translate(-50%, -50%)",
-              pointerEvents: "none",
-              opacity: point.hovered ? 1 : 0,
-              transition: "opacity 0.2s",
-              background: "rgba(0, 0, 0, 0.8)",
-              color: "white",
-              padding: "4px 8px",
-              borderRadius: "4px",
-              fontSize: "12px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {point.station.name}
-          </div>
-        ))}
-      </GlobeRenderer>
+      />
 
       {/* Tooltip for hovered station */}
       <Tooltip

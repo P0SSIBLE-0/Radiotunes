@@ -4,7 +4,7 @@ import Globe, { type GlobeMethods } from "react-globe.gl";
 import * as THREE from "three";
 import { motion } from "motion/react";
 import { debounce } from "../utils/debounce";
-import type { Station} from "radio-browser-api";
+import type { Station } from "../types/radio.t";
 
 // Define types
 interface FeatureProperties {
@@ -28,7 +28,6 @@ interface GlobeRendererProps {
   onPointHover: (point: any, event?: MouseEvent) => void;
   pointsData: any[];
   windowSize: { width: number; height: number };
-  children?: React.ReactNode;
 }
 
 const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
@@ -40,7 +39,6 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
     onPointHover,
     pointsData,
     windowSize,
-    children,
   }) => {
     const globeEl = useRef<GlobeMethods | undefined>(undefined);
     const globeMaterial = useMemo(
@@ -55,10 +53,10 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
         }),
       []
     );
-    // Add debounce to hover handler
+
     const debouncedHover = useCallback(
-      debounce((point: any, event?: MouseEvent) => {
-        onPointHover?.(point, event);
+      debounce((point: any) => {
+        onPointHover?.(point);
       }, 50),
       [onPointHover]
     );
@@ -95,15 +93,14 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
     
       if (controls) {
         controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.01; // Slower, smooth rotation
-        controls.enableDamping = true;  // Adds easing to rotation
+        controls.autoRotateSpeed = 0.01;
+        controls.enableDamping = true;
         controls.dampingFactor = 0.1;
       }
     
-      // Optional: animate controls in a render loop if damping is used
       function animate() {
         requestAnimationFrame(animate);
-        controls.update(); // Needed for damping to take effect
+        controls.update();
       }
       animate();
     
@@ -118,11 +115,10 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
 
     // Focus on current station
     useEffect(() => {
-      console.log("Current station:", currentStation);
       if (
         globeEl.current &&
-        currentStation?.geoLat != null &&
-        currentStation?.geoLong != null
+        currentStation?.geo_lat != null &&
+        currentStation?.geo_long != null
       ) {
         const controls = globeEl.current.controls();
         globeEl.current.camera().position.z = 150;
@@ -130,8 +126,8 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
         controls.autoRotateSpeed = 0.02;
         globeEl.current.pointOfView(
           {
-            lat: currentStation?.geoLat,
-            lng: currentStation?.geoLong,
+            lat: currentStation?.geo_lat,
+            lng: currentStation?.geo_long,
             altitude: 1,
           },
           1000
@@ -183,12 +179,12 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
     const pointColor = useCallback(
       (point: any) => {
         if (!point) return "#ef4444";
-        if (currentStation?.id === point.station?.stationuuid)
+        if (currentStation?.stationuuid === point.station?.stationuuid)
           return "#3b82f6";
         if (point.hovered) return "#111";
         return "#ef4444";
       },
-      [currentStation?.id]
+      [currentStation?.stationuuid]
     );
 
     return (
@@ -203,7 +199,6 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
       >
         <div
           onMouseMove={(e) => {
-            // Store the last mouse position
             if (onPointHover) {
               onPointHover(null, e.nativeEvent);
             }
@@ -226,11 +221,6 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
               powerPreference: "high-performance",
               preserveDrawingBuffer: false,
             }}
-            pointOfView={{
-              lat: currentStation?.geoLat,
-              lng: currentStation?.geoLong,
-              altitude: 1.5,
-            }}
             lineHoverPrecision={1}
             enablePointerInteraction={true}
             showGraticules={false}
@@ -242,8 +232,6 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
             polygonCapColor="#334155"
             polygonSideColor="#1e293b"
             polygonStrokeColor="rgba(255, 255, 255, 0.5)"
-            polygonStrokeWidth={1.5}
-            polygonResolution={3}
             polygonLabel={getPolygonLabel}
             onPolygonClick={handlePolygonClick}
             onPolygonHover={handlePolygonHover}
@@ -263,15 +251,6 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
             labelColor={() => "#252525"}
             labelAltitude={0.0025}
             labelIncludeDot={false}
-            labelStyle={{
-              background: "rgba(0, 0, 0, 0.8)",
-              padding: "2px 6px",
-              borderRadius: "4px",
-              fontSize: "10px",
-              cursor: "default",
-              textShadow: "0 0 3px rgba(0,0,0)",
-              whiteSpace: "nowrap",
-            }}
             // Points (radio stations)
             pointsData={pointsData}
             pointAltitude={0.0025}
@@ -282,10 +261,7 @@ const GlobeRenderer: React.FC<GlobeRendererProps> = React.memo(
             onPointClick={onPointClick}
             pointsTransitionDuration={300}
             pointResolution={5}
-            pointerEvents={["click", "hover"]}
-          >
-            {children}
-          </Globe>
+          />
         </div>
       </motion.div>
     );

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Howl } from "howler";
 import {
   type RadioState,
+  type Station,
 } from "../types/radio.t";
 import {
   fetchStations,
@@ -61,7 +62,7 @@ export const useRadioStore = create<RadioState>((set, get) => ({
     set({ currentSound: null, isPlaying: false });
   },
 
-  selectStation: (station, index) => {
+  selectStation: (station: Station, index: number) => {
     console.log(
       "Selecting station:",
       station.name,
@@ -93,7 +94,6 @@ export const useRadioStore = create<RadioState>((set, get) => ({
       onloaderror: (_, err) => {
         console.error("Howler load error for station:", station.name, err);
         set({ isLoading: false, isPlaying: false });
-        // Try to play next station or show error
       },
       onplay: () => {
         console.log("Audio started playing");

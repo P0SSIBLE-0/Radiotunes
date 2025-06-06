@@ -1,12 +1,37 @@
 // src/types/radio.t.ts
 import { Howl } from 'howler';
-import type { StationResponse } from "radio-browser-api";
+
+// This is our app's station type, mapped from the API response.
+// It resolves inconsistencies like 'tags' being a string instead of string[].
+export interface Station {
+  changeuuid: string;
+  stationuuid: string;
+  name: string;
+  url: string;
+  url_resolved: string;
+  homepage: string;
+  favicon: string;
+  tags: string[];
+  country: string;
+  countrycode: string;
+  state: string;
+  language: string[];
+  votes: number;
+  codec: string;
+  bitrate: number;
+  hls: boolean;
+  lastcheckok: boolean;
+  clickcount: number;
+  geo_lat?: number | null;
+  geo_long?: number | null;
+}
+
 
 export interface RadioState {
   // Station state
-  stations: StationResponse[];
-  filteredStations: StationResponse[];
-  currentStation: StationResponse | null;
+  stations: Station[];
+  filteredStations: Station[];
+  currentStation: Station | null;
   currentStationIndex: number | null;
   
   // Audio state
@@ -31,7 +56,7 @@ export interface RadioState {
 
   // Station actions
   fetchAndSetStations: (autoSelectFirst?: boolean) => Promise<void>;
-  selectStation: (station: StationResponse, index: number) => void;
+  selectStation: (station: Station, index: number) => void;
   playNextStation: () => void;
   playPreviousStation: () => void;
   playRandomStation: () => void;

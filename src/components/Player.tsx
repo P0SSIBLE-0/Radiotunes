@@ -43,7 +43,7 @@ const Player: React.FC = () => {
   };
 
   const handleExpandClick = () => {
-    setIsFiltersExpanded(true);
+    setIsFiltersExpanded(!isFiltersExpanded);
   };
 
   // const handleOutsideClick = (event: MouseEvent) => {
@@ -57,8 +57,8 @@ const Player: React.FC = () => {
 
 
   return (
-    <motion.div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-white/30 backdrop-blur-sm border-2 border-white/20 shadow-2xl rounded-2xl p-5 text-gray-800 z-50">
-      <div className="relative">
+    <motion.div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-white/30 backdrop-blur-md border-2 border-white/20 shadow-2xl rounded-2xl p-5 text-gray-800 z-50">
+      <div className="">
         {/* Top Utility Row */}
         <div className="flex justify-between items-center mb-4 px-4">
           {/* Other buttons */}
@@ -96,13 +96,13 @@ const Player: React.FC = () => {
                 opacity: 0,
                 scale: 0.95,
                 x: 0,
-                y: 0,
+                y: 100,
               }}
               animate={{
                 opacity: 1,
                 scale: 1,
                 x: 0,
-                y: 0,
+                y: -10,
                 transition: {
                   type: "spring",
                   damping: 25,

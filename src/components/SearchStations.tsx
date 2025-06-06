@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Command, X, Radio, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRadioStore } from '../store/radioStore';
-import type { Station } from 'radio-browser-api';
+import type { Station } from '../types/radio.t'; // <-- Use our app's Station type
 
 // Debounce hook
 const useDebounce = (value: string, delay: number) => {
@@ -24,7 +24,7 @@ const useDebounce = (value: string, delay: number) => {
 const SearchStations: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
+  // selectedStationId was unused, so it's removed.
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { 
     searchStations, 
@@ -50,7 +50,6 @@ const SearchStations: React.FC = () => {
 
   const handleSelectStation = useCallback((station: Station, index: number) => {
     selectStation(station, index);
-    setSelectedStationId(station.stationuuid);
     setSearchQuery('');
     play().catch(console.error);
   }, [selectStation, play]);
@@ -66,7 +65,6 @@ const SearchStations: React.FC = () => {
       }
     } else {
       selectStation(station, index);
-      setSelectedStationId(station.stationuuid);
       play().catch(console.error);
     }
   }, [currentStation, isPlaying, play, pause, selectStation]);

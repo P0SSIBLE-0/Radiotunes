@@ -1,6 +1,6 @@
 import React from "react";
-import { type Station } from "../services/radioApi";
-import { AnimatePresence, motion } from "framer-motion"; // Changed from "motion/react"
+import { type Station } from "../types/radio.t"; // <-- Use our app's Station type
+import { AnimatePresence, motion } from "framer-motion";
 import { Radio } from "lucide-react";
 
 interface GeoJsonFeature {
@@ -55,14 +55,9 @@ const Tooltip: React.FC<TooltipProps> = ({
             <div className="ml-2 flex-1">
             <div className="font-bold text-sm mb-1">{hoveredStation?.name}</div>
             <div className="text-xs opacity-80">{hoveredStation?.country}</div>
-            {hoveredStation?.tags && (
+            {hoveredStation?.tags && hoveredStation.tags.length > 0 && ( // <-- Simplified logic
               <div className="text-xs opacity-70 mt-1">
-                {Array.isArray(hoveredStation?.tags)
-                  ? hoveredStation?.tags.slice(0, 3).join(", ")
-                  : String(hoveredStation?.tags)
-                      .split(",")
-                      .slice(0, 3)
-                      .join(", ")}
+                {hoveredStation.tags.slice(0, 3).join(", ")}
               </div>
             )}
           </div>
