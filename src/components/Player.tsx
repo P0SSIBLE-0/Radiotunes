@@ -1,194 +1,167 @@
-import React, {  useRef, useState } from "react";
+// src/components/Player.tsx
+
+import React, { useState, useEffect } from "react";
 import { useRadioStore } from "../store/radioStore";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
   Pause,
   Volume2,
-  VolumeX,
   Heart,
   MapPin,
   DollarSign,
   Moon,
   Shuffle,
   Maximize2,
+  Loader2,
+  Link,
 } from "lucide-react";
 import Filters from "./Filters";
 
+
 const Player: React.FC = () => {
-  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
-  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [time, setTime] = useState("");
 
   const {
     currentStation,
     isPlaying,
-    volume,
+    isLoading,
     togglePlayPause,
-    setVolume,
-    playRandomStation, // Added playRandomStation
-    // playNextStation, // Removed for now to match UI image
-    // playPreviousStation, // Removed for now to match UI image
+    playRandomStation,
   } = useRadioStore();
 
+  // Effect for the live clock in the expanded view
+  useEffect(() => {
+    if (isExpanded) {
+      const timer = setInterval(() => {
+        setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      }, 1000);
+      // Set initial time
+      setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      return () => clearInterval(timer);
+    }
+  }, [isExpanded]);
+
+
   if (!currentStation) {
+    // A simple placeholder when no station is selected
     return (
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white shadow-xl rounded-xl p-6 text-gray-700 z-50">
-        <p className="text-center text-gray-500">No station selected.</p>
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-sm px-4">
+        <div className="h-20 bg-white/70 backdrop-blur-xl border border-white/20 shadow-lg rounded-2xl flex justify-center items-center">
+          <p className="text-slate-500">No station selected.</p>
+        </div>
       </div>
     );
   }
 
-  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVolume(parseFloat(event.target.value));
+  const FADE_IN_VARIANTS = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
   };
-
-  const handleExpandClick = () => {
-    setIsFiltersExpanded(!isFiltersExpanded);
-  };
-
-  // const handleOutsideClick = (event: MouseEvent) => {
-  //   if (
-  //     toggleButtonRef.current &&
-  //     !toggleButtonRef.current.contains(event.target as Node)
-  //   ) {
-  //     setIsFiltersExpanded(false);
-  //   }
-  // };
-
 
   return (
-    <motion.div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-sm bg-white/30 backdrop-blur-md border-2 border-white/20 shadow-2xl rounded-2xl p-5 text-gray-800 z-50">
-      <div className="">
-        {/* Top Utility Row */}
-        <div className="flex justify-between items-center mb-4 px-4">
-          {/* Other buttons */}
-          <div className="flex space-x-3">
-            <button title="Sponsor (not implemented)">
-              <DollarSign
-                size={18}
-                className="text-gray-500 hover:text-gray-700"
-              />
-            </button>
-            <button title="Theme (not implemented)">
-              <Moon size={18} className="text-gray-500 hover:text-gray-700" />
-            </button>
-            <button
-              ref={toggleButtonRef}
-              onClick={handleExpandClick}
-              title="Filters"
-              className="transition-colors hover:bg-gray-100 p-1 rounded"
-            >
-              <Maximize2
-                size={18}
-                className={`text-gray-500 hover:text-gray-700 transition-transform ${
-                  isFiltersExpanded ? "rotate-45" : ""
-                }`}
-              />
-            </button>
+    // This container holds both the Filters and the Player, managing their overall layout.
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 flex flex-col items-center gap-3 z-50">
+      
+      {/* --- Animated Filters Panel --- */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Filters />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- Main Player Container --- */}
+      <motion.div
+        layout="position"
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="w-full bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl p-4"
+        style={{
+            borderRadius: isExpanded ? '24px' : '16px',
+        }}
+      >
+        {isExpanded ? (
+          // --- EXPANDED LAYOUT ---
+          <div className="flex flex-col gap-4">
+            {/* Top Bar: Time and Utility Icons */}
+            <div className="flex justify-between items-center text-slate-600">
+              <span className="font-mono text-sm">{time}</span>
+              <div className="flex items-center gap-3">
+                <button title="Link (not implemented)"><Link size={18} /></button>
+                <button title="Sponsor (not implemented)"><DollarSign size={18} className="text-green-600" /></button>
+                <button title="Theme (not implemented)"><Moon size={18} /></button>
+                <button onClick={() => setIsExpanded(false)} title="Collapse">
+                  <Maximize2 size={18} className="rotate-180 cursor-pointer" />
+                </button>
+              </div>
+            </div>
+
+            {/* Station Info */}
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-slate-800 truncate" title={currentStation.name}>
+                {currentStation.name}
+              </h2>
+              <p className="text-sm text-slate-500">{currentStation.country}</p>
+            </div>
+
+            {/* Main Controls */}
+            <div className="flex justify-around items-center text-slate-600">
+              <button onClick={togglePlayPause} title={isPlaying ? "Pause" : "Play"}>
+                <AnimatePresence>
+                  {isLoading ? (
+                    <motion.div key="loader" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Loader2 size={24} className="animate-spin" /></motion.div>
+                  ) : isPlaying ? (
+                    <motion.div key="pause" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Pause size={24} /></motion.div>
+                  ) : (
+                    <motion.div key="play" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Play size={24} /></motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
+              <button title="Volume (not implemented)"><Volume2 size={24} /></button>
+              <button title="Favorite (not implemented)"><Heart size={24} /></button>
+              <button title="Show on Map (not implemented)"><MapPin size={24} /></button>
+              <button onClick={playRandomStation} title="Play Random Station"><Shuffle size={24} /></button>
+            </div>
           </div>
-        </div>
-
-        {/* Animated Filters Panel */}
-        <AnimatePresence>
-          {isFiltersExpanded && (
-            <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0.95,
-                x: 0,
-                y: 100,
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                x: 0,
-                y: -10,
-                transition: {
-                  type: "spring",
-                  damping: 25,
-                  stiffness: 300,
-                },
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.95,
-                x: 0,
-                y: 100,
-                transition: { duration: 0.2 },
-              }}
-              className="w-full max-w-sm"
-            >
-              <Filters />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Station Info */}
-      <div className="text-center mb-5">
-        <h2
-          className="text-xl font-semibold truncate"
-          title={currentStation.name}
-        >
-          {currentStation.name}
-        </h2>
-        <p
-          className="text-sm text-gray-500 truncate"
-          title={currentStation.country || ""}
-        >
-          {currentStation.country}
-        </p>
-      </div>
-
-      {/* Main Controls Row */}
-      <div className="flex items-center justify-around">
-        <button
-          onClick={togglePlayPause}
-          className="p-2 text-gray-700 hover:text-zinc-800 transition-colors"
-          title={isPlaying ? "Pause" : "Play"}
-        >
-          {isPlaying ? <Pause size={28} /> : <Play size={28} />}
-        </button>
-
-        <div className="flex items-center w-1/3">
-          {volume === 0 ? (
-            <VolumeX size={20} className="text-gray-600 mr-2" />
-          ) : (
-            <Volume2 size={20} className="text-gray-600 mr-2" />
-          )}
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-pink-500"
-            title={`Volume: ${Math.round(volume * 100)}%`}
-          />
-        </div>
-
-        <button
-          className="p-2 text-gray-600 hover:text-pink-500"
-          title="Favorite (not implemented)"
-        >
-          <Heart size={22} />
-        </button>
-        <button
-          className="p-2 text-gray-600 hover:text-pink-500"
-          title="Show on map (not implemented)"
-        >
-          <MapPin size={22} />
-        </button>
-        <button
-          onClick={playRandomStation}
-          className="p-2 text-gray-600 hover:text-pink-500"
-          title="Play Random Station"
-        >
-          <Shuffle size={22} />
-        </button>
-      </div>
-    </motion.div>
+        ) : (
+          // --- COLLAPSED LAYOUT ---
+          <div className="flex items-center gap-3 px-4 justify-between">
+            {/* Station Info */}
+            <div className="w-1/2">
+              <h3 className="font-semibold text-slate-800 truncate">{currentStation.name}</h3>
+              <p className="text-xs text-slate-500 truncate">{currentStation.country}</p>
+            </div>
+            
+            {/* Controls */}
+            <div className="flex items-center gap-3 text-slate-600">
+              <button onClick={togglePlayPause} title={isPlaying ? "Pause" : "Play"}>
+                <AnimatePresence mode="wait">
+                    {isLoading ? (
+                        <motion.div key="loader_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Loader2 size={20} className="animate-spin" /></motion.div>
+                    ) : isPlaying ? (
+                        <motion.div key="pause_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Pause size={20} /></motion.div>
+                    ) : (
+                        <motion.div key="play_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Play size={20} /></motion.div>
+                    )}
+                </AnimatePresence>
+              </button>
+              <button title="Favorite (not implemented)"><Heart size={20} /></button>
+              <button title="Sponsor (not implemented)"><DollarSign size={20} className="text-green-600"/></button>
+              <button onClick={() => setIsExpanded(true)} title="Expand"><Maximize2 size={20} /></button>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </div>
   );
 };
 

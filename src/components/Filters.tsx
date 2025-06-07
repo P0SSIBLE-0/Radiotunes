@@ -31,7 +31,7 @@ const Filters: React.FC = () => {
         {/* Content for selected tab */}
         {activeTab === 'genres' && (
           <div className="relative">
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar">
+            <div className="flex items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
               {/* Placeholder for scroll buttons if many genres */}
               {/* <button className="p-1.5 rounded-full hover:bg-gray-200/70"><ChevronLeft size={18} /></button> */}
               {genres.map((genre) => (
@@ -54,7 +54,7 @@ const Filters: React.FC = () => {
         )}
 
         {activeTab === 'moods' && (
-          <div className="text-center text-sm text-gray-800 font-semibold py-4">
+          <div className="text-center text-sm text-gray-800 font-semibold py-3">
             Mood-based filtering is coming soon!
           </div>
         )}
