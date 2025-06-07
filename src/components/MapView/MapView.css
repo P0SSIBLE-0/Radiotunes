@@ -1,0 +1,138 @@
+/* src/components/MapView/MapView.css */
+
+/* Keyframes for the pulsing animation on the active marker */
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(38, 222, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(38, 222, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(38, 222, 129, 0);
+  }
+}
+.leaflet-container {
+  width: 100%;
+  height: 100vh;
+  background-color: #f0f2f5;
+  outline: none;
+}
+
+/* Custom marker for the currently active/selected station */
+.station-marker-active {
+  width: 10px;
+  height: 10px;
+  background-color: #26de81;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transform: scale(1);
+  animation: pulse 2s infinite;
+  cursor: pointer;
+  z-index: 1000 !important;
+}
+.station-tooltip {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(5px);
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px 12px !important;
+}
+
+.station-tooltip .leaflet-tooltip-content {
+  white-space: nowrap;
+}
+
+.station-tooltip .tooltip-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d3436;
+  margin: 0;
+  padding: 0;
+}
+
+.station-tooltip .tooltip-country {
+  font-size: 12px;
+  color: #636e72;
+  margin: 0;
+  padding: 0;
+}
+
+
+.station-marker-wrapper .station-marker-inner {
+  width: 7px;
+  height: 7px;
+  background-color: #2c3e50;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  will-change: transform;
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Add this rule as well for the hover effect */
+.station-marker-wrapper:hover .station-marker-inner {
+    transform: scale(1.7);
+}
+
+
+/* tooltips style */
+.hover-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-50%, calc(-100% - 15px)); /* Position above cursor */
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(5px);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.tooltip-favicon-container {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background-color: #f0f2f5;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.tooltip-favicon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tooltip-fallback-icon {
+  color: #636e72;
+  width: 20px;
+  height: 20px;
+}
+
+.tooltip-text-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d3436;
+}
+
+.tooltip-country {
+  font-size: 12px;
+  color: #636e72;
+}

@@ -17,7 +17,7 @@ body, html, #root {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #111827; /* bg-gray-900 */
+  background-color: #f0f2f5; /* Updated background to match map */
 }
 
 /* Custom scrollbar for filter component (optional, but nice) */
@@ -28,35 +28,4 @@ body, html, #root {
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-}
-
-
-.globe-point {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.globe-point:hover {
-  transform: scale(1.5);
-  z-index: 10;
-}
-
-/* Add this to your global CSS */
-canvas {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  cursor: grab;
-}
-
-/* Hardware acceleration */
-.globe-container {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000;
-  will-change: transform;
 }
