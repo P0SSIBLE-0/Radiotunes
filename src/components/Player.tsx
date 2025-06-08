@@ -21,7 +21,6 @@ import Filters from "./Filters";
 const Player: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [time, setTime] = useState("");
-  const [isError, setIsError] = useState(false);
 
   const {
     currentStation,
@@ -63,15 +62,6 @@ const Player: React.FC = () => {
     exit: { opacity: 0, y: 10, scale: 0.9, transition: { duration: 0.2 } },
   };
 
-  useEffect(() => {
-    if (errorFetchingStations) {
-      setIsError(true);
-    }
-    let timerId = setTimeout(() => {
-      setIsError(false);
-    }, 3000);
-    return () => clearTimeout(timerId);
-  }, [errorFetchingStations]);
   return (
     // This container holds both the Filters and the Player, managing their overall layout.
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 flex flex-col items-center gap-3 z-50">
@@ -90,7 +80,7 @@ const Player: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      {errorFetchingStations && isError && (
+      {errorFetchingStations && (
           <motion.div 
             initial="initial"
             animate="animate"

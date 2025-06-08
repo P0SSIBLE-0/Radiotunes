@@ -20,7 +20,7 @@ const Filters: React.FC = () => {
 
   return (
     <div className="w-full">
-      <div className="bg-white/30 backdrop-blur-md shadow-lg rounded-lg p-3">
+      <div className="bg-white/30 backdrop-blur-md shadow-lg rounded-xl p-3">
         {/* Tabs for Genres/Moods */}
         <div className="flex mb-3">
           <button

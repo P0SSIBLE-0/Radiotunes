@@ -53,7 +53,7 @@ export async function fetchStations(
       limit: limit,
       offset: offset, // Add offset for chunking
       hasGeoInfo: true,
-      order: "clickcount", // Get most popular stations first
+      order: "clickCount", // Get most popular stations first
       reverse: true, // Required for descending order
       hideBroken: true,
     });
