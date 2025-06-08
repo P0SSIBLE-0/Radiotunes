@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { Howl } from "howler";
-import {
-  type RadioState,
-  type Station,
-} from "../types/radio.t";
+import { type RadioState, type Station } from "../types/radio.t";
 import {
   fetchStations,
   recordStationClick,
@@ -11,40 +8,81 @@ import {
   fetchGenres as fetchGenresApi,
 } from "../services/radioApi";
 
-
 export const useRadioStore = create<RadioState>((set, get) => ({
-   // Initial state
-   stations: [],
-   filteredStations: [],
-   currentStation: null,
-   currentStationIndex: null,
-   isPlaying: false,
-   volume: 0.5,
-   isLoadingStations: false,
-   errorFetchingStations: null,
-   currentSound: null,
-   isLoading: false,
-   searchQuery: "",
-   selectedGenre: null,
-   selectedMood: null,
-   genres: [],
-   isSearching: false,
-   searchError: null,
+  // Initial state
+  stations: [],
+  stationsOnMap: [],
+  filteredStations: [],
+  currentStation: null,
+  currentStationIndex: null,
+  isPlaying: false,
+  volume: 0.5,
+  isLoadingStations: false,
+  errorFetchingStations: null,
+  currentSound: null,
+  isLoading: false,
+  searchQuery: "",
+  selectedMood: null,
+  genres: [],
+  isSearching: false,
+  error: { message: "", isError: false },
+  searchError: null,
+  allStationsLoaded: false,
+  preMuteVolume: 0.5, // To store volume before muting
+  selectedGenre: "All", // A trigger to tell the map to locate a station
+  locateStationTrigger: 0,
 
   fetchAndSetStations: async (autoSelectFirst = false) => {
-    set({ isLoadingStations: true, errorFetchingStations: null });
+    // If we're already fetching in the background or have loaded everything, don't start again.
+    if (get().isLoadingStations || get().allStationsLoaded) return;
+
+    // Only show the main "Loading Map..." screen if it's the very first fetch.
+    if (get().stations.length === 0) {
+      set({ isLoadingStations: true, errorFetchingStations: null });
+    }
+
+    const CHUNK_SIZE = 500;
+    let isFirstChunk = get().stations.length === 0;
+
     try {
-      const stations = await fetchStations(1000);
-      console.log("Radio store stations:", stations.length);
-      set({ stations, isLoadingStations: false });
-      if (autoSelectFirst && stations.length > 0 && !get().currentStation) {
-        get().selectStation(stations[0], 0);
+      // Loop to fetch stations in chunks until the API returns an empty/small chunk
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const currentOffset = get().stations.length;
+        const chunk = await fetchStations(CHUNK_SIZE, currentOffset);
+
+        // Append the new chunk to the existing station list
+        set((state) => ({
+          stations: [...state.stations, ...chunk],
+          stationsOnMap: [...state.stationsOnMap, ...chunk],
+        }));
+        set({ selectedGenre: "All" });
+
+        // If this was the very first chunk, update the main loading state and auto-select a station
+        if (isFirstChunk) {
+          set({ isLoadingStations: false });
+          if (autoSelectFirst && chunk.length > 0 && !get().currentStation) {
+            get().selectStation(chunk[0], 0);
+          }
+          isFirstChunk = false;
+        }
+
+        // If the returned chunk is smaller than requested, we've reached the end
+        if (chunk.length < CHUNK_SIZE) {
+          set({ allStationsLoaded: true });
+          console.log(`All stations loaded. Total: ${get().stations.length}`);
+          break;
+        }
+
+        // Small delay to be polite to the API
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     } catch (error) {
-      console.error("Error fetching stations in store:", error);
+      console.error("Error during incremental fetch:", error);
       set({
         errorFetchingStations: "Failed to fetch stations",
         isLoadingStations: false,
+        allStationsLoaded: true, // Stop trying on error
       });
     }
   },
@@ -74,12 +112,12 @@ export const useRadioStore = create<RadioState>((set, get) => ({
 
     // Create new Howl instance
     const audioUrl = station.url_resolved || station.url;
-     
+
     if (!audioUrl) {
       console.error("No valid audio URL provided for station:", station.name);
       set({ isLoading: false, isPlaying: false });
       return;
-    } 
+    }
 
     const newSound = new Howl({
       src: [audioUrl],
@@ -89,11 +127,15 @@ export const useRadioStore = create<RadioState>((set, get) => ({
       preload: false, // Don't preload for streaming
       onload: () => {
         console.log("Audio loaded successfully");
-        set({ isLoading: false });
+        set({ isLoading: false, errorFetchingStations: null });
       },
       onloaderror: (_, err) => {
         console.error("Howler load error for station:", station.name, err);
-        set({ isLoading: false, isPlaying: false });
+        set({
+          isLoading: false,
+          isPlaying: false,
+          errorFetchingStations: "Failed to load station",
+        });
       },
       onplay: () => {
         console.log("Audio started playing");
@@ -163,6 +205,7 @@ export const useRadioStore = create<RadioState>((set, get) => ({
 
       try {
         await currentSound.play();
+        set({ errorFetchingStations: null });
       } catch (error) {
         console.error("Error starting playback:", error);
         set({ isLoading: false, isPlaying: false });
@@ -204,6 +247,7 @@ export const useRadioStore = create<RadioState>((set, get) => ({
       const nextIndex = (currentStationIndex + 1) % stations.length;
       get().selectStation(stations[nextIndex], nextIndex);
       setTimeout(() => get().play(), 100);
+      set({ errorFetchingStations: null });
     }
   },
 
@@ -215,6 +259,7 @@ export const useRadioStore = create<RadioState>((set, get) => ({
       get().selectStation(stations[prevIndex], prevIndex);
       setTimeout(() => get().play(), 100);
     }
+    set({ errorFetchingStations: null });
   },
 
   playRandomStation: () => {
@@ -242,13 +287,16 @@ export const useRadioStore = create<RadioState>((set, get) => ({
     setTimeout(() => get().play(), 100);
   },
 
-  
   setSearchQuery: (query: string) => set({ searchQuery: query }),
-  
-  setSelectedGenre: (genre: string | null) => set({ selectedGenre: genre }),
-  
+
+  setSelectedGenre: (genre: string | null) => {
+    set({ selectedGenre: genre });
+
+    get().filterStationsByGenre(); // Re-filter the map stations when genre changes
+  },
+
   setSelectedMood: (mood: string | null) => set({ selectedMood: mood }),
-  
+
   searchStations: async (query: string) => {
     set({ isSearching: true, searchError: null });
     try {
@@ -256,49 +304,69 @@ export const useRadioStore = create<RadioState>((set, get) => ({
       set({ filteredStations: stations, isSearching: false });
     } catch (error) {
       console.error("Error searching stations:", error);
-      set({ 
-        searchError: "Failed to search stations", 
-        isSearching: false 
+      set({
+        searchError: "Failed to search stations",
+        isSearching: false,
       });
     }
   },
-  
+
   filterStations: () => {
     const { stations, searchQuery, selectedGenre, selectedMood } = get();
-    
+
     let filtered = [...stations];
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(station => 
-        station.name.toLowerCase().includes(query) ||
-        station.tags?.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        (station) =>
+          station.name.toLowerCase().includes(query) ||
+          station.tags?.some((tag) => tag.toLowerCase().includes(query))
       );
     }
-    
+
     if (selectedGenre) {
-      filtered = filtered.filter(station => 
+      filtered = filtered.filter((station) =>
         station.tags.includes(selectedGenre)
       );
     }
-    
+
     if (selectedMood) {
-      filtered = filtered.filter(station => 
-        station.tags?.some(tag => 
+      filtered = filtered.filter((station) =>
+        station.tags?.some((tag) =>
           tag.toLowerCase().includes(selectedMood.toLowerCase())
         )
       );
     }
-    
+
     set({ filteredStations: filtered });
   },
-  
+
   fetchGenres: async () => {
     try {
       const genres = await fetchGenresApi();
-      set({ genres });
+      set({ genres: ["All", ...genres] });
     } catch (error) {
       console.error("Error fetching genres:", error);
     }
+  },
+  filterStationsByGenre: () => {
+    const { stations, selectedGenre } = get();
+
+    // If "All" is selected or no genre is chosen, show all stations
+    if (!selectedGenre || selectedGenre === "All") {
+      set({ stationsOnMap: stations });
+      return;
+    }
+    const genreToFilter = selectedGenre.toLowerCase();
+
+    const filtered = stations.filter((station) =>
+      station.tags.some((tag) => tag.toLowerCase() === genreToFilter)
+    );
+
+    set({ stationsOnMap: filtered });
+  },
+  locateCurrentStation: () => {
+    set((state) => ({ locateStationTrigger: state.locateStationTrigger + 1 }));
   },
 }));

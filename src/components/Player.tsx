@@ -1,4 +1,3 @@
-// src/components/Player.tsx
 
 import React, { useState, useEffect } from "react";
 import { useRadioStore } from "../store/radioStore";
@@ -29,6 +28,8 @@ const Player: React.FC = () => {
     isLoading,
     togglePlayPause,
     playRandomStation,
+    locateCurrentStation,
+    errorFetchingStations,
   } = useRadioStore();
 
   // Effect for the live clock in the expanded view
@@ -55,10 +56,10 @@ const Player: React.FC = () => {
     );
   }
 
-  const FADE_IN_VARIANTS = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.2 } },
-    exit: { opacity: 0, transition: { duration: 0.2 } },
+  const ERROR_POPUP_VARIANTS = {
+    initial: { opacity: 0, y: 20, scale: 0.95 },
+    animate: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } },
+    exit: { opacity: 0, y: 10, scale: 0.9, transition: { duration: 0.2 } },
   };
 
   return (
@@ -79,7 +80,19 @@ const Player: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
+      {errorFetchingStations && (
+          <motion.div 
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={ERROR_POPUP_VARIANTS}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-21 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-50">
+            <div className="bg-red-500 border-2 border-red-100 rounded-xl p-2">
+              <p className="text-white text-center font-semibold">{errorFetchingStations}</p>
+            </div>
+          </motion.div>
+        )}
       {/* --- Main Player Container --- */}
       <motion.div
         layout="position"
@@ -115,21 +128,22 @@ const Player: React.FC = () => {
 
             {/* Main Controls */}
             <div className="flex justify-around items-center text-slate-600">
-              <button onClick={togglePlayPause} title={isPlaying ? "Pause" : "Play"}>
-                <AnimatePresence>
-                  {isLoading ? (
-                    <motion.div key="loader" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Loader2 size={24} className="animate-spin" /></motion.div>
-                  ) : isPlaying ? (
-                    <motion.div key="pause" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Pause size={24} /></motion.div>
-                  ) : (
-                    <motion.div key="play" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Play size={24} /></motion.div>
-                  )}
-                </AnimatePresence>
-              </button>
-              <button title="Volume (not implemented)"><Volume2 size={24} /></button>
-              <button title="Favorite (not implemented)"><Heart size={24} /></button>
-              <button title="Show on Map (not implemented)"><MapPin size={24} /></button>
-              <button onClick={playRandomStation} title="Play Random Station"><Shuffle size={24} /></button>
+                <button onClick={togglePlayPause} title={isPlaying ? "Pause" : "Play"}>
+                    <AnimatePresence>
+                    {isLoading ? (
+                        <motion.div key="loader"><Loader2 size={24} className="animate-spin" /></motion.div>
+                    ) : isPlaying ? (
+                        <motion.div key="pause"><Pause size={24} /></motion.div>
+                    ) : (
+                        <motion.div key="play"><Play size={24} /></motion.div>
+                    )}
+                    </AnimatePresence>
+                </button>
+                <button title="Volume (not implemented)"><Volume2 size={24} /></button>
+                <button title="Favorite (not implemented)"><Heart size={24} /></button>
+                {/* --- THIS IS THE NEW BUTTON --- */}
+                <button onClick={locateCurrentStation} title="Show on Map"><MapPin size={24} /></button>
+                <button onClick={playRandomStation} title="Play Random Station"><Shuffle size={24} /></button>
             </div>
           </div>
         ) : (
@@ -146,11 +160,11 @@ const Player: React.FC = () => {
               <button onClick={togglePlayPause} title={isPlaying ? "Pause" : "Play"}>
                 <AnimatePresence mode="wait">
                     {isLoading ? (
-                        <motion.div key="loader_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Loader2 size={20} className="animate-spin" /></motion.div>
+                        <motion.div key="loader_c"><Loader2 size={20} className="animate-spin" /></motion.div>
                     ) : isPlaying ? (
-                        <motion.div key="pause_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Pause size={20} /></motion.div>
+                        <motion.div key="pause_c"><Pause size={20} /></motion.div>
                     ) : (
-                        <motion.div key="play_c" variants={FADE_IN_VARIANTS} initial="hidden" animate="visible" exit="exit"><Play size={20} /></motion.div>
+                        <motion.div key="play_c"><Play size={20} /></motion.div>
                     )}
                 </AnimatePresence>
               </button>

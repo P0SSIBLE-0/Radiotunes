@@ -1,4 +1,7 @@
-import { RadioBrowserApi, type Station as RadioApiStation } from "radio-browser-api";
+import {
+  RadioBrowserApi,
+  type Station as RadioApiStation,
+} from "radio-browser-api";
 import type { Station } from "../types/radio.t";
 
 // Initialize the API with a user agent
@@ -15,13 +18,21 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   url_resolved: s.urlResolved,
   homepage: s.homepage,
   favicon: s.favicon,
-  tags: typeof s.tags === 'string'
-  ? (s.tags as string).split(',').map((t: any) => t.trim()).filter(Boolean)
-  : [],
+  tags: typeof s.tags
+    ? (s.tags as string[])
+        .map((t: any) => t.trim().toLowerCase())
+        .filter(Boolean)
+    : [],
   country: s.country,
   countrycode: s.countryCode,
   state: s.state,
-  language: typeof s.language === 'string' ? (s.language as string).split(',').map((t:any) => t.trim()).filter(Boolean) : [],
+  language:
+    typeof s.language === "string"
+      ? (s.language as string)
+          .split(",")
+          .map((t: any) => t.trim().toLowerCase())
+          .filter(Boolean)
+      : [],
   votes: s.votes,
   codec: s.codec,
   bitrate: s.bitrate,
@@ -32,23 +43,28 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   geo_long: s.geoLong,
 });
 
-export async function fetchStations(limit: number = 500): Promise<Station[]> {
-  console.log("Fetching stations using radio-browser-api...");
+export async function fetchStations(
+  limit: number = 500,
+  offset: number = 0
+): Promise<Station[]> {
+  console.log(`Fetching ${limit} stations with offset ${offset}...`);
   try {
     const stationsFromServer = await api.searchStations({
       limit: limit,
+      offset: offset, // Add offset for chunking
       hasGeoInfo: true,
-      order: "random",
+      order: "clickCount", // Get most popular stations first
+      reverse: true, // Required for descending order
       hideBroken: true,
     });
     console.log("Raw stations fetched from server:", stationsFromServer.length);
 
     if (stationsFromServer.length === 0) {
       console.warn(
-        "No stations returned from API. Check filters or API status."
+        "No stations returned from API for this chunk. This may be the end of the list."
       );
     }
-    
+
     return stationsFromServer.map(mapApiStation);
   } catch (error: any) {
     console.error("Error fetching stations with radio-browser-api:", error);
@@ -84,12 +100,30 @@ export async function recordStationClick(stationUuid: string): Promise<void> {
 }
 
 export const fetchGenres = async (): Promise<string[]> => {
-  console.log("Fetching genres...");
+  console.log("Fetching, sorting, and cleaning genres...");
   try {
     const tags = await api.getTags();
 
-    // Filter out empty tags and return the names
-    return tags.map((tag) => tag.name.trim()).filter((name) => name.length > 0);
+    // Sort tags by station count in descending order to get the most popular ones
+    const sortedTags = tags.sort((a, b) => b.stationcount - a.stationcount);
+
+    // Process the top tags to create a clean list of genres
+    const genres = sortedTags
+      .slice(0, 40) // Take the top 40 most popular tags
+      .map((tag) => tag.name.trim()) // Get the name and trim whitespace
+      // Filter out irrelevant tags like years ("80s"), bitrates ("128kbps"), and generic terms
+      .filter(
+        (name) =>
+          name.length > 2 &&
+          !/^\d+s?$/.test(name) &&
+          !/^\d+kbps$/.test(name) &&
+          !["news", "talk", "sports"].includes(name.toLowerCase())
+      )
+      // Capitalize the first letter of each genre for a clean UI
+      .map((name) => name.charAt(0).toUpperCase() + name.slice(1));
+
+    console.log(`Found and cleaned ${genres.length} top genres.`);
+    return genres;
   } catch (error) {
     console.error("Error fetching genres:", error);
     return [];
