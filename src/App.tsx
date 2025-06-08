@@ -4,6 +4,7 @@ import SearchStations from './components/SearchStations';
 import { useRadioStore } from './store/radioStore';
 import './App.css';
 import LeafletMap from './components/MapView/LeafletMap';
+import LoadingCounter from './components/LoadingCounter';
 
 function App() {
   const fetchAndSetStations = useRadioStore((state) => state.fetchAndSetStations);
@@ -15,6 +16,7 @@ function App() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
       <LeafletMap />
+      <LoadingCounter />
       <SearchStations />
       {/* <Filters /> */}
       <Player />

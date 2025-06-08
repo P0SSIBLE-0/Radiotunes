@@ -1,10 +1,6 @@
-// src/components/MapView/LeafletMap.tsx
-
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import * as PIXI from 'pixi.js';
-import 'leaflet-pixi-overlay';
 import { useRadioStore } from '../../store/radioStore.ts';
 import type { Station } from '../../types/radio.t.ts';
 import HoverTooltip from './HoverTooltip.tsx';
@@ -12,134 +8,94 @@ import HoverTooltip from './HoverTooltip.tsx';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
-const ZOOM_THRESHOLD = 4;
-
-// --- Component 1: Controls map events (zoom and navigation) ---
+// --- Controls map events (zoom and navigation) ---
 const MapController: React.FC<{
   setZoom: (zoom: number) => void;
-  currentStation: Station | null;
-}> = ({ setZoom, currentStation }) => {
+}> = ({ setZoom }) => {
   const map = useMapEvents({
     zoomend: () => setZoom(map.getZoom()),
   });
 
+  const { currentStation, locateStationTrigger } = useRadioStore();
+
+  // Effect to fly to the station when it's selected or the locate trigger is fired
   useEffect(() => {
     if (currentStation?.geo_lat != null && currentStation?.geo_long != null) {
       const currentMapZoom = map.getZoom();
-      map.flyTo([currentStation.geo_lat, currentStation.geo_long], currentMapZoom < ZOOM_THRESHOLD ? ZOOM_THRESHOLD : currentMapZoom, {
+      const targetZoom = Math.max(currentMapZoom, 5); 
+      map.flyTo([currentStation.geo_lat, currentStation.geo_long], targetZoom, {
         animate: true,
         duration: 1.5,
       });
     }
-  }, [currentStation, map]);
+  // The locateStationTrigger dependency ensures this runs even if the station is the same
+  }, [currentStation, locateStationTrigger, map]); 
 
   return null;
 };
 
-// --- Component 2: The FINAL, STABLE, AND CORRECT PixiJS points layer ---
-const PixiPointsLayer = () => {
-  const map = useMap();
-  const { stations, currentStation } = useRadioStore();
-  const overlayRef = useRef<any>(null);
-
-  // Use refs to hold the latest data. This is crucial to avoid stale closures.
-  const stationsRef = useRef(stations);
-  const currentStationRef = useRef(currentStation);
-
-  // Keep the refs updated whenever the state changes.
-  useEffect(() => {
-    stationsRef.current = stations;
-    currentStationRef.current = currentStation;
-    // When data changes, manually trigger a redraw of the layer.
-    if (overlayRef.current) {
-      overlayRef.current.redraw();
-    }
-  }, [stations, currentStation]);
-
-  // This effect runs only ONCE to set up the PIXI layer.
-  useEffect(() => {
-    if (!map) return;
-
-    const pixiContainer = new PIXI.Container();
-    const graphics = new PIXI.Graphics();
-    pixiContainer.addChild(graphics);
-
-    const drawCallback = (utils: any) => {
-      // Always get the latest data from the refs inside the draw loop.
-      const currentStations = stationsRef.current;
-      const activeStation = currentStationRef.current;
-
-      graphics.clear(); // Clear previous frame
-
-      const pointsToRender = currentStations.filter(
-        s => s.stationuuid !== activeStation?.stationuuid && s.geo_lat != null && s.geo_long != null
-      );
-      
-      const zoom = utils.getMap().getZoom();
-      const pointSize = Math.max(2.5, (zoom / ZOOM_THRESHOLD) * 3);
-
-      graphics.beginFill(0x2c3e50, 0.9);
-
-      pointsToRender.forEach(point => {
-        const { x, y } = utils.latLngToLayerPoint([point.geo_lat!, point.geo_long!]);
-        graphics.drawCircle(x, y, pointSize);
-      });
-
-      graphics.endFill();
-      utils.getRenderer().render(pixiContainer);
-    };
-
-    const pixiOverlay = (L as any).pixiOverlay(drawCallback, pixiContainer);
-    pixiOverlay.addTo(map);
-    overlayRef.current = pixiOverlay; // Store the layer instance in a ref
-
-    return () => {
-      map.removeLayer(pixiOverlay);
-    };
-  }, [map]); // This effect should only run once when the map is ready.
-
-  return null;
-};
-
-// --- Component 3: Interactive Markers (Unchanged) ---
-const InteractiveMarkers: React.FC<{
+// --- High-Performance Canvas Markers using only Leaflet ---
+const StationMarkers: React.FC<{
   setHoverInfo: (info: { station: Station; x: number; y: number } | null) => void;
 }> = ({ setHoverInfo }) => {
-  const { stations, currentStation, selectStation, play } = useRadioStore();
+  const map = useMap();
+  // --- MODIFICATION: Use stationsOnMap for filtering ---
+  const { stationsOnMap, currentStation, selectStation, play } = useRadioStore();
+  const layerRef = useRef<L.FeatureGroup | null>(null);
 
-  const handleMarkerClick = (station: Station) => {
-    const stationIndex = stations.findIndex(s => s.stationuuid === station.stationuuid);
+  const handleStationClick = useCallback((station: Station) => {
+    // We find the index from the filtered list to maintain correct next/prev logic
+    const stationIndex = stationsOnMap.findIndex(s => s.stationuuid === station.stationuuid);
     if (stationIndex !== -1) {
       selectStation(station, stationIndex);
       setTimeout(() => play().catch(console.error), 100);
     }
-  };
+  }, [stationsOnMap, selectStation, play]);
 
-  return (
-    <>
-      {stations
-        .filter(s => s.stationuuid !== currentStation?.stationuuid && s.geo_lat != null && s.geo_long != null)
-        .map((station) => (
-          <Marker
-            key={station.stationuuid}
-            position={[station.geo_lat!, station.geo_long!]}
-            icon={L.divIcon({ className: 'station-marker-wrapper', html: '<div class="station-marker-inner"></div>' })}
-            eventHandlers={{
-              click: () => handleMarkerClick(station),
-              mouseover: (e) => {
-                setHoverInfo({ station, x: e.originalEvent.clientX, y: e.originalEvent.clientY });
-              },
-              mouseout: () => {
-                setHoverInfo(null);
-              },
-            }}
-          />
-        ))}
-    </>
-  );
+  // Create the main layer group only once
+  useEffect(() => {
+    if (!layerRef.current) {
+      layerRef.current = L.featureGroup().addTo(map);
+    }
+  }, [map]);
+
+  // --- MODIFICATION: Update markers when stationsOnMap changes ---
+  useEffect(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+
+    layer.clearLayers(); // Clear old markers
+
+    stationsOnMap.forEach(station => {
+      if (station.stationuuid === currentStation?.stationuuid || !station.geo_lat || !station.geo_long) {
+        return;
+      }
+
+      const marker = L.circleMarker([station.geo_lat, station.geo_long], {
+        radius: 4,
+        fillColor: "#000000",
+        fillOpacity: 0.8,
+        color: "#FFFFFF",
+        weight: 1,
+        interactive: true,
+      });
+
+      marker.on('mouseover', (e) => setHoverInfo({ station, x: e.originalEvent.clientX, y: e.originalEvent.clientY }));
+      marker.on('mouseout', () => setHoverInfo(null));
+      marker.on('click', () => handleStationClick(station));
+
+      layer.addLayer(marker);
+    });
+  }, [stationsOnMap, currentStation, map, handleStationClick, setHoverInfo]);
+
+  return null;
 };
+
+
+// --- Main Map Component ---
 const LeafletMap: React.FC = () => {
-  const { isLoadingStations, stations, currentStation } = useRadioStore();
+  // --- MODIFICATION: Get stationsOnMap as 'stations' for clarity below ---
+  const { isLoadingStations, stationsOnMap: stations, currentStation } = useRadioStore();
   const mapRef = useRef<L.Map>(null);
   const [zoom, setZoom] = useState(3);
   const [hoverInfo, setHoverInfo] = useState<{ station: Station; x: number; y: number } | null>(null);
@@ -175,13 +131,13 @@ const LeafletMap: React.FC = () => {
           maxZoom={13}
           worldCopyJump={true}
           zoomControl={false}
+          preferCanvas={true} 
         >
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
-          <MapController setZoom={setZoom} currentStation={currentStation} />
-          <PixiPointsLayer />
-          <InteractiveMarkers setHoverInfo={setHoverInfo} />
+          <MapController setZoom={setZoom} />
+          <StationMarkers setHoverInfo={setHoverInfo} />
           {activeStationMarker}
         </MapContainer>
       </div>

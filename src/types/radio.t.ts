@@ -30,9 +30,11 @@ export interface Station {
 export interface RadioState {
   // Station state
   stations: Station[];
+  stationsOnMap: Station[];
   filteredStations: Station[];
   currentStation: Station | null;
   currentStationIndex: number | null;
+  locateStationTrigger: number;
   
   // Audio state
   isPlaying: boolean;
@@ -43,6 +45,7 @@ export interface RadioState {
   // Loading states
   isLoadingStations: boolean;
   isSearching: boolean;
+  allStationsLoaded: boolean; // <-- Added
   
   // Error states
   errorFetchingStations: string | null;
@@ -54,12 +57,16 @@ export interface RadioState {
   selectedMood: string | null;
   genres: string[];
 
+
   // Station actions
   fetchAndSetStations: (autoSelectFirst?: boolean) => Promise<void>;
   selectStation: (station: Station, index: number) => void;
   playNextStation: () => void;
   playPreviousStation: () => void;
   playRandomStation: () => void;
+  filterStationsByGenre: () => void;
+  locateCurrentStation: () => void;
+  
   
   // Playback actions
   play: () => Promise<void>;
