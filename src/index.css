@@ -1,10 +1,49 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --primary-color: #2563eb;
-  --secondary-color: #1e293b;
-  --text-color: #1e293b;
-  --font-sans: "Poppins", sans-serif;
+  /* Default Light Theme */
+  --color-background: #f0f2f5; /* Light grey */
+  --color-foreground: #ffffff; /* White */
+  --color-primary: #1e293b; /* Dark slate */
+  --color-secondary: #64748b; /* Lighter slate */
+  --color-accent: #2563eb; /* Blue */
+  --color-border: #e2e8f0; /* Light border */
+
+  /* Map Marker Colors */
+  --color-marker-inner: #2c3e50;
+  --color-marker-border: #ffffff;
+}
+
+html.dark {
+  /* Dark Theme Overrides */
+  --color-background: #111b; /* Dark blue-slate */
+  --color-foreground: #1e293b; /* Lighter dark slate */
+  --color-primary: #e2e8f0; /* Light grey */
+  --color-secondary: #94a3b8; /* Lighter grey */
+  --color-accent: #38bdf8; /* Sky blue */
+  --color-border: #334155; /* Darker border */
+
+  /* Inverted Map Marker Colors */
+  --color-marker-inner: #ffffff;
+  --color-marker-border: #0f172a;
+}
+
+@theme{
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-border: var(--color-border);
+  --marker-inner: var(--color-marker-inner);
+  --marker-border: var(--color-marker-border);
+}
+body, html, #root {
+  /* ... (rest of your body styles) */
+  background-color: var(--color-background);
+  color: var(--color-primary);
 }
 
 
@@ -14,10 +53,10 @@ body, html, #root {
   width: 100%;
   height: 100%;
   overflow: hidden; /* Prevent scrollbars on the body itself */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f2f5; /* Updated background to match map */
+  background-color: var(--color-background); /* Updated background to match map */
 }
 
 /* Custom scrollbar for filter component (optional, but nice) */

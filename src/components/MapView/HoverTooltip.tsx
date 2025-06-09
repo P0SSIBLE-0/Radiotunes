@@ -39,7 +39,7 @@ const HoverTooltip: React.FC<HoverTooltipProps> = ({ info }) => {
     <AnimatePresence>
       {info && (
         <motion.div
-          className="hover-tooltip max-w-xs"
+          className="bg-white dark:bg-zinc-900 text-primary flex max-w-xs gap-2 px-3 py-2.5 rounded-lg items-center justify-center font-sans"
           style={{
             position: 'fixed',
             left: info.x,
@@ -52,21 +52,21 @@ const HoverTooltip: React.FC<HoverTooltipProps> = ({ info }) => {
           animate="visible"
           exit="exit"
         >
-          <div className="tooltip-favicon-container">
+          <div className="size-10 overflow-hidden rounded-xl flex items-center justify-center">
             {!showFallbackIcon && info.station.favicon ? (
               <img
                 src={info.station.favicon}
                 alt={info.station.name}
-                className="tooltip-favicon"
+                className="w-full h-full object-cover rounded-xl"
                 onError={handleImageError}
               />
             ) : (
-              <Radio className="tooltip-fallback-icon" />
+              <Radio className="size-6 m-auto" />
             )}
           </div>
-          <div className="tooltip-text-container">
-            <div className="tooltip-name text-wrap">{info.station.name}</div>
-            <div className="tooltip-country text-wrap">{info.station.country}</div>
+          <div className="tooltip-text-container flex-1">
+            <div className="tooltip-name text-wrap font-semibold">{info.station.name}</div>
+            <div className="tooltip-country text-wrap text-xs opacity-80">{info.station.country}</div>
           </div>
         </motion.div>
       )}

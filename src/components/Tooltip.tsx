@@ -44,7 +44,7 @@ const Tooltip: React.FC<TooltipProps> = ({
             transform: "translate(-50%, -100%)",
           }}
         >
-          <div className="flex items-center bg-gray-100 bg-opacity-90 text-black p-3 rounded-lg border-2 border-gray-300 shadow-xl max-w-xs min-w-72 font-sans">
+          <div className="flex items-center bg-background/40 backdrop-blur-md text-primary p-3 rounded-lg border-2 border-gray-300 shadow-xl max-w-xs min-w-72 font-sans">
             <div className="w-10">
               {hoveredStation?.favicon ? (
                 <img src={hoveredStation.favicon} alt="Station Icon" className="w-full h-full object-contain" />

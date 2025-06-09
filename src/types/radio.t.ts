@@ -27,63 +27,7 @@ export interface Station {
 }
 
 
-export interface RadioState {
-  // Station state
-  stations: Station[];
-  stationsOnMap: Station[];
-  filteredStations: Station[];
-  currentStation: Station | null;
-  currentStationIndex: number | null;
-  locateStationTrigger: number;
-  
-  // Audio state
-  isPlaying: boolean;
-  volume: number;
-  currentSound: Howl | null;
-  isLoading: boolean;
-  
-  // Loading states
-  isLoadingStations: boolean;
-  isSearching: boolean;
-  allStationsLoaded: boolean; // <-- Added
-  
-  // Error states
-  errorFetchingStations: string | null;
-  searchError: string | null;
-  
-  // Filtering state
-  searchQuery: string;
-  selectedGenre: string | null;
-  selectedMood: string | null;
-  genres: string[];
-
-
-  // Station actions
-  fetchAndSetStations: (autoSelectFirst?: boolean) => Promise<void>;
-  selectStation: (station: Station, index: number) => void;
-  playNextStation: () => void;
-  playPreviousStation: () => void;
-  playRandomStation: () => void;
-  filterStationsByGenre: () => void;
-  locateCurrentStation: () => void;
-  
-  
-  // Playback actions
-  play: () => Promise<void>;
-  pause: () => void;
-  togglePlayPause: () => void;
-  setVolume: (volume: number) => void;
-  cleanupCurrentSound: () => void;
-  
-  // Filter actions
-  setSearchQuery: (query: string) => void;
-  setSelectedGenre: (genre: string | null) => void;
-  setSelectedMood: (mood: string | null) => void;
-  searchStations: (query: string) => Promise<void>;
-  filterStations: () => void;
-  fetchGenres: () => Promise<void>;
-}
-
+export type RadioState = StationSlice & PlayerSlice & UserSlice;
 // Common moods that can be used for filtering
 export const MOODS = [
   "Chill", "Energetic", "Focus", "Relaxing", 
@@ -92,3 +36,45 @@ export const MOODS = [
 ] as const;
 
 export type Mood = typeof MOODS[number];
+
+export interface StationSlice {
+  stations: Station[];
+  stationsOnMap: Station[];
+  isLoadingStations: boolean;
+  allStationsLoaded: boolean;
+  errorFetchingStations: string | null;
+  genres: string[];
+  selectedGenre: string | null;
+  fetchAndSetStations: (autoSelectFirst?: boolean) => Promise<void>;
+  fetchGenres: () => Promise<void>;
+  filterStationsByGenre: () => void;
+  setSelectedGenre: (genre: string | null) => void;
+}
+
+export interface PlayerSlice {
+  currentStation: Station | null;
+  currentStationIndex: number | null;
+  isPlaying: boolean;
+  isLoading: boolean; // Player-specific loading
+  currentSound: Howl | null;
+  errorFetchingStations: string | null;
+  volume: number;
+  selectStation: (station: Station, index: number) => void;
+  play: () => Promise<void>;
+  pause: () => void;
+  togglePlayPause: () => void;
+  cleanupCurrentSound: () => void;
+  playNextStation: () => void;
+  playRandomStation: () => void;
+  searchStations: (query: string) => void;
+  filteredStations: Station[];
+  isSearching: boolean; 
+}
+export interface UserSlice {
+  favoriteStationIds: string[];
+  isDarkMode: boolean;
+  toggleFavorite: (stationId: string) => void;
+  toggleDarkMode: () => void;
+  locateStationTrigger: number;
+  locateCurrentStation: () => void;
+}
