@@ -75,8 +75,8 @@
 
 
 .station-marker-wrapper .station-marker-inner {
-  width: 14px;
-  height: 14px;
+  width: 20px !important;
+  height: 20px !important;
   border-radius: 50%;
   will-change: transform;
   transition: transform 0.2s ease-in-out;

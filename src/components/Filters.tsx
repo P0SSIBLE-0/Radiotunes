@@ -49,7 +49,7 @@ const Filters: React.FC = () => {
                     ${
                       selectedGenre === genre
                         ? "bg-primary text-background"
-                        : "bg-background text-primary hover:bg-primary hover:text-background"
+                        : "bg-background/90 text-primary hover:bg-primary hover:text-background"
                     }`}
                 >
                   {genre === "All" && (

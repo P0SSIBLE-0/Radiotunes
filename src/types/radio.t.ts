@@ -54,6 +54,7 @@ export interface StationSlice {
 export interface PlayerSlice {
   currentStation: Station | null;
   currentStationIndex: number | null;
+  initialStationId: string | null;
   isPlaying: boolean;
   isLoading: boolean; // Player-specific loading
   currentSound: Howl | null;
@@ -67,7 +68,9 @@ export interface PlayerSlice {
   playNextStation: () => void;
   playRandomStation: () => void;
   searchStations: (query: string) => void;
+  setInitialStationId: (stationId: string | null) => void;
   filteredStations: Station[];
+  setVolume: (volume: number) => void;
   isSearching: boolean; 
 }
 export interface UserSlice {

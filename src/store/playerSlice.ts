@@ -18,6 +18,10 @@ export const createPlayerSlice: StateCreator<
   isSearching: false,
   errorFetchingStations: null,
   filteredStations: [],
+  initialStationId: null,
+  setInitialStationId: (stationId: string | null) => {
+    set({ initialStationId: stationId });
+  },
   searchStations: async (query: string) => {
     set({ isSearching: true });
     try {
@@ -64,6 +68,10 @@ export const createPlayerSlice: StateCreator<
       currentSound: newSound,
     });
     recordStationClick(station.stationuuid);
+  },
+  setVolume: (volume: number) => {
+    set({ volume });
+    get().currentSound?.volume(volume);
   },
 
   play: async () => {

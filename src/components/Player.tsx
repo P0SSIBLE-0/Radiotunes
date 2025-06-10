@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
   Pause,
-  Volume2,
   Heart,
   MapPin,
   Moon,
@@ -12,13 +11,15 @@ import {
   Maximize2,
   Minimize2,
   Loader2,
-  Link,
+  Share2,
 } from "lucide-react";
 import Filters from "./Filters";
+import Volume from "./Volume";
 
 const Player: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [time, setTime] = useState("");
+ 
 
   const {
     currentStation,
@@ -31,6 +32,8 @@ const Player: React.FC = () => {
     toggleDarkMode,
     toggleFavorite,
     favoriteStationIds,
+    currentSound,
+    setVolume,
   } = useAppStore();
 
   // Effect for the live clock in the expanded view
@@ -78,6 +81,36 @@ const Player: React.FC = () => {
   };
 
   const isFavorite = favoriteStationIds.includes(currentStation.stationuuid);
+
+  const handleShare = async () => {
+    if (!currentStation) return;
+
+    const shareUrl = `${window.location.origin}/?station=${currentStation.stationuuid}`;
+    const shareData = {
+      title: "Check out this radio station!",
+      text: `Listen to ${currentStation.name} on Radiotunes.`,
+      url: shareUrl,
+    };
+
+    // Use the Web Share API if available (on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        console.log("Station shared successfully!");
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
+    } else {
+      // Fallback for desktop: copy URL to clipboard
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied to clipboard!"); // Simple feedback
+      } catch (err) {
+        console.error("Failed to copy link:", err);
+        alert("Failed to copy link.");
+      }
+    }
+  };
 
   return (
     // This container holds both the Filters and the Player, managing their overall layout.
@@ -128,8 +161,8 @@ const Player: React.FC = () => {
             <div className="flex justify-between items-center text-primary">
               <span className="font-mono text-sm">{time}</span>
               <div className="flex items-center gap-3">
-                <button title="Link (not implemented)">
-                  <Link size={18} />
+                <button title="Share">
+                  <Share2 onClick={handleShare} size={18} />
                 </button>
                 <button onClick={toggleDarkMode} title="Theme">
                   <Moon size={18} />
@@ -146,7 +179,7 @@ const Player: React.FC = () => {
                 className="text-2xl font-semibold text-primary truncate"
                 title={currentStation.name}
               >
-                {currentStation.name }
+                {currentStation.name}
               </h2>
               <p className="text-sm text-secondary">{currentStation.country}</p>
             </div>
@@ -157,23 +190,21 @@ const Player: React.FC = () => {
                 onClick={togglePlayPause}
                 title={isPlaying ? "Pause" : "Play"}
               >
-                  {isLoading ? (
-                    <motion.div key="loader">
-                      <Loader2 size={24} className="animate-spin" />
-                    </motion.div>
-                  ) : isPlaying ? (
-                    <motion.div key="pause">
-                      <Pause size={24} />
-                    </motion.div>
-                  ) : (
-                    <motion.div key="play">
-                      <Play size={24} />
-                    </motion.div>
-                  )}
+                {isLoading ? (
+                  <motion.div key="loader">
+                    <Loader2 size={24} className="animate-spin" />
+                  </motion.div>
+                ) : isPlaying ? (
+                  <motion.div key="pause">
+                    <Pause size={24} />
+                  </motion.div>
+                ) : (
+                  <motion.div key="play">
+                    <Play size={24} />
+                  </motion.div>
+                )}
               </button>
-              <button title="Volume (not implemented)">
-                <Volume2 size={24} />
-              </button>
+              <Volume currentSound={currentSound} setVolume={setVolume} />
               <button
                 title={
                   isFavorite ? "Remove from favorites" : "Add to favorites"
@@ -181,7 +212,7 @@ const Player: React.FC = () => {
                 className={isFavorite ? "text-red-500" : "dark:text-slate-200"}
                 onClick={() => toggleFavorite(currentStation.stationuuid)}
               >
-                <Heart size={24} fill={isFavorite ? "red" : "none"}/>
+                <Heart size={24} fill={isFavorite ? "red" : "none"} />
               </button>
               {/* --- THIS IS THE NEW BUTTON --- */}
               <button onClick={locateCurrentStation} title="Show on Map">
@@ -212,22 +243,20 @@ const Player: React.FC = () => {
                 title={isPlaying ? "Pause" : "Play"}
               >
                 {isLoading ? (
-                    <motion.div key="loader_c">
-                      <Loader2 size={20} className="animate-spin" />
-                    </motion.div>
-                  ) : isPlaying ? (
-                    <motion.div key="pause_c">
-                      <Pause size={20} />
-                    </motion.div>
-                  ) : (
-                    <motion.div key="play_c">
-                      <Play size={20} />
-                    </motion.div>
-                  )}
+                  <motion.div key="loader_c">
+                    <Loader2 size={20} className="animate-spin" />
+                  </motion.div>
+                ) : isPlaying ? (
+                  <motion.div key="pause_c">
+                    <Pause size={20} />
+                  </motion.div>
+                ) : (
+                  <motion.div key="play_c">
+                    <Play size={20} />
+                  </motion.div>
+                )}
               </button>
-              <button title="Volume (not implemented)">
-                <Volume2 size={20} />
-              </button>
+              <Volume currentSound={currentSound} setVolume={setVolume} />
               <button
                 title={
                   isFavorite ? "Remove from favorites" : "Add to favorites"
