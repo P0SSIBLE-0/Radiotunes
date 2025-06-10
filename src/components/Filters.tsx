@@ -22,7 +22,7 @@ const Filters: React.FC = () => {
 
   return (
     <div className="w-full">
-      <div className="bg-background/40 backdrop-blur-md shadow-lg rounded-xl p-3">
+      <div className="bg-background/40 backdrop-blur-md shadow-lg rounded-2xl p-3">
         {/* Tabs for Genres/Moods */}
         <div className="flex mb-3">
           <button
@@ -39,13 +39,13 @@ const Filters: React.FC = () => {
 
         {/* Genre buttons */}
         <div className="relative">
-          <div className="flex items-center space-x-2 overflow-x-auto py-2 no-scrollbar">
+          <div className="flex items-center space-x-2 overflow-x-auto py-1 no-scrollbar">
             {GENRES.length > 0 ? (
               GENRES.map((genre) => (
                 <button
                   key={genre}
                   onClick={() => setSelectedGenre(genre)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer
+                  className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer
                     ${
                       selectedGenre === genre
                         ? "bg-primary text-background"
