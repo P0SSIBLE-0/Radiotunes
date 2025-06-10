@@ -21,19 +21,29 @@
   background-color: #f0f2f5;
   outline: none;
 }
-
+.leaflet-marker-icon, 
+.leaflet-marker-shadow, 
+.leaflet-marker-pane * {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 /* Custom marker for the currently active/selected station */
-.station-marker-active {
-  width: 12px;
-  height: 12px;
-  background-color: #26de81;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  transform: scale(1);
-  animation: pulse 2s infinite;
-  cursor: pointer;
+.marker-active {
+  transform: scale(1.5);
+  transition: transform 0.1s ease;
   z-index: 1000 !important;
+}
+
+/* For the active station marker */
+.station-marker-active {
+  width: 15px !important;
+  height: 15px !important;
+  background-color: #3bf657;
+  border: 2px solid white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+  animation: pulse 2s infinite;
 }
 .station-tooltip {
   background-color: rgba(255, 255, 255, 0.95) !important;

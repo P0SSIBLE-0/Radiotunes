@@ -99,7 +99,7 @@ const SearchStations: React.FC = () => {
       initial={{ width: "250px" }}
       animate={{ width: isFocused ? "100%" : "200px" }}
       transition={{ duration: 0.2, ease: "anticipate"}}
-      className="relative mx-auto">
+      className="relative mx-auto shadow-md">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
           <Search className="text-secondary" size={20} />
         </div>

@@ -80,12 +80,24 @@ const StationMarkers: React.FC<{
         color: isDarkMode ? "#252525" : "#FFFFFF",
         weight: 1,
         interactive: true,
+        bubblingMouseEvents: false,
+        className: 'station-marker',
       });
 
       marker.on('mouseover', (e) => setHoverInfo({ station, x: e.originalEvent.clientX, y: e.originalEvent.clientY }));
       marker.on('mouseout', () => setHoverInfo(null));
       marker.on('click', () => handleStationClick(station));
-
+      marker.on('click touchstart', (e) => {
+        L.DomEvent.stopPropagation(e);
+        handleStationClick(station);
+        
+        // Add visual feedback
+        const element = e.target.getElement();
+        if (element) {
+          element.classList.add('marker-active');
+          setTimeout(() => element.classList.remove('marker-active'), 200);
+        }
+      });
       layer.addLayer(marker);
     });
   }, [stationsOnMap, currentStation, map, handleStationClick, setHoverInfo, isDarkMode]);
@@ -138,6 +150,8 @@ const LeafletMap: React.FC = () => {
           preferCanvas={true} 
           maxBounds={[[-90, -180], [90, 180]]}
           maxBoundsViscosity={1}
+          zoomSnap={0.5}
+          zoomDelta={0.5}
         >
           <TileLayer
             url={isDarkMode ? darkThemeUrl : lightThemeUrl}
