@@ -132,9 +132,8 @@ const LeafletMap: React.FC = () => {
   }, [currentStation]);
 
   if (isLoadingStations && stations.length === 0) {
-    return <div className="w-full h-full flex items-center justify-center bg-gray-100"><p className="text-xl text-slate-500 font-semibold animate-pulse">Loading Map...</p></div>;
+    return <div className="w-full h-full flex items-center justify-center bg-gray-100"><p className="text-xl text-slate-500 font-semibold">Loading Map...</p></div>;
   }
-
   return (
     <div className="relative w-screen h-screen">
       <div className="absolute top-0 left-0 w-full h-full z-10">

@@ -7,7 +7,7 @@ import type { Station } from "../types/radio.t";
 // Initialize the API with a user agent
 const api = new RadioBrowserApi("RadioGlobeApp/1.0");
 //https://api.radio-browser.info/net you can see running server info here.
-api.setBaseUrl("https://fi1.api.radio-browser.info");
+api.setBaseUrl("https://de1.api.radio-browser.info");
 
 // Helper function to map API station to our app's Station interface
 const mapApiStation = (s: RadioApiStation): Station => ({
