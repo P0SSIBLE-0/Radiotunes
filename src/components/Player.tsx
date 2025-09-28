@@ -120,10 +120,10 @@ const Player: React.FC = () => {
         {isExpanded && (
           <motion.div
             className="w-full"
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            initial={{ opacity: 0, y: 400, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: "backOut" }}
           >
             <Filters />
           </motion.div>

@@ -12,11 +12,15 @@ function App() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const stationIdFromUrl = urlParams.get('station');
+    const DEFAULT_STATION_ID = "0e5dfcc8-99e2-4fed-a232-7f4bf23ba3c3";
     if (stationIdFromUrl) {
       console.log(`Found station ID in URL: ${stationIdFromUrl}`);
       setInitialStationId(stationIdFromUrl);
       // Optional: Clean the URL after reading the parameter
       // window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    else{
+      setInitialStationId(DEFAULT_STATION_ID);
     }
   }, [setInitialStationId]);
 

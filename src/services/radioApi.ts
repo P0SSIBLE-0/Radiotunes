@@ -3,11 +3,21 @@ import {
   type Station as RadioApiStation,
 } from "radio-browser-api";
 import type { Station } from "../types/radio.t";
-
+import selectBestMirror from "./apiMirror";
 // Initialize the API with a user agent
 const api = new RadioBrowserApi("RadioGlobeApp/1.0");
 //https://api.radio-browser.info/net you can see running server info here.
-api.setBaseUrl("https://de1.api.radio-browser.info");
+
+let currentMirror:string;
+try {
+  (async () => {
+    currentMirror = await selectBestMirror();
+    api.setBaseUrl(currentMirror);
+  })();
+} catch (error) {
+  currentMirror = "https://fi1.api.radio-browser.info";
+  api.setBaseUrl(currentMirror);
+}
 
 // Helper function to map API station to our app's Station interface
 const mapApiStation = (s: RadioApiStation): Station => ({
