@@ -1,43 +1,39 @@
 {
   "name": "radio-app",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.8",
-    "axios": "^1.9.0",
+    "axios": "^1.13.0",
+    "clsx": "^2.1.1",
     "howler": "^2.2.4",
     "idb-keyval": "^6.2.2",
     "leaflet": "^1.9.4",
-    "lucide-react": "^0.512.0",
-    "motion": "^12.16.0",
+    "lucide-react": "^0.548.0",
+    "motion": "^12.23.24",
+    "next": "16.0.0",
     "radio-browser-api": "^6.0.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "react-leaflet": "^5.0.0",
-    "tailwindcss": "^4.1.8",
-    "zustand": "^5.0.5"
+    "tailwind-merge": "^3.3.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@types/geojson": "^7946.0.16",
+    "@tailwindcss/postcss": "^4",
     "@types/howler": "^2.2.12",
-    "@types/leaflet": "^1.9.18",
-    "@types/node": "^22.15.29",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react": "^4.4.1",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
