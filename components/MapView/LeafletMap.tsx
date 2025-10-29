@@ -188,9 +188,9 @@ const LeafletMap: React.FC = () => {
 
   if (isLoadingStations && stations.length === 0) {
     return (
-      <div className="w-full h-full flex items-center justify-center dark:bg-zinc-800 bg-gray-50">
-        <Loader2 className="animate-spin mr-2" size={18} />
-        <p className="text-xl text-neutral-400 font-semibold">Loading Map...</p>
+      <div className="w-full h-full flex items-center justify-center dark:bg-zinc-900 bg-gray-50 dark:text-neutral-400 text-neutral-500">
+        <Loader2 className="animate-spin mr-2" size={20} />
+        <p className="text-lg font-semibold leading-1.5">Loading...</p>
       </div>
     );
   }

@@ -63,7 +63,7 @@ const Player: React.FC = () => {
 
   // Show error toast when errorFetchingStations changes
   useEffect(() => {
-    console.log(errorFetchingStations);
+
     if (!!errorFetchingStations) {
       toast.error(errorFetchingStations);
     }
@@ -135,7 +135,7 @@ const Player: React.FC = () => {
       {/* --- Main Player Container --- */}
       <motion.div
         layout="position"
-        transition={{ type: "spring", damping: 25, stiffness: 500, duration: 0.3 }}
+        transition={{ type: "spring", damping: 25, stiffness: 550, duration: 0.3 }}
         className="w-full bg-background backdrop-blur-xl border border-background/20 shadow-xl p-4"
         style={{
           borderRadius: isExpanded ? "24px" : "16px",

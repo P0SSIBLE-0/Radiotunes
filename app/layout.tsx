@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en",
     siteName: "Radio-tunes",
-    url: "",
+    url: "https://radiotunes.vercel.app",
     images: [
       {
         url: "https://radiotunes.vercel.app/screenshot_dark.png",
@@ -29,7 +29,19 @@ export const metadata: Metadata = {
         height: 630,
         alt: "Radio-tunes",
       },
+      {
+        url: "https://radiotunes.vercel.app/screenshot.png",
+        width: 1200,
+        height: 630,
+        alt: "Radio-tunes",
+      },
     ],
+  },
+  twitter: {
+    title: "Radio-tunes",
+    description: "Radio-tunes listen to radio stations worldwide",
+    card: "summary_large_image",
+    images: ['https://radiotunes.vercel.app/screenshot_dark.png', 'https://radiotunes.vercel.app/screenshot.png'],
   },
 };
 
