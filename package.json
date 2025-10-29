@@ -20,6 +20,7 @@
     "radio-browser-api": "^6.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hot-toast": "^2.6.0",
     "react-leaflet": "^5.0.0",
     "tailwind-merge": "^3.3.1",
     "zustand": "^5.0.8"
