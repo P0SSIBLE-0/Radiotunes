@@ -1,93 +1,36 @@
-# 🌍 RadioTunes - Global Internet Radio Player
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A modern, responsive web application for streaming internet radio stations from around the world. Built with React, TypeScript, and Vite.
+## Getting Started
 
-![RadioTunes Screenshot](public/screenshot.png) 
-![RadioTunes Screenshot DarkMode](public/screenshot_dark.png) 
+First, run the development server:
 
-## ✨ Features
-
-- 🎵 Stream thousands of internet radio stations
-- 🗺️ Interactive map view to discover stations by location.
-- 🔍 Search and filter stations by name, country, or genre
-- ❤️ Favorite your preferred stations for quick access
-- 🌓 Dark/Light mode support.
-- 📱 Fully responsive design.
-- ⚡ Fast and lightweight.
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or later)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone git@github.com:P0SSIBLE-0/Radiotunes.git
-   cd radio-app
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-4. Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-## 🛠️ Built With
-
-- [React](https://reactjs.org/) - JavaScript library for building user interfaces
-- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
-- [Vite](https://vitejs.dev/) - Next Generation Frontend Tooling
-- [Zustand](https://github.com/pmndrs/zustand) - State management
-- [Leaflet](https://leafletjs.com/) - Interactive maps
-- [Howler.js](https://howlerjs.com/) - Audio library for the web
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [Lucide React](https://lucide.dev/) - Beautiful & consistent icons
-
-## 📂 Project Structure
-
-```
-src/
-├── components/       # Reusable UI components
-├── store/           # State management with Zustand
-├── services/        # API and service integrations
-├── types/           # TypeScript type definitions
-├── utils/           # Utility functions
-└── App.tsx          # Main application component
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## 🤝 Contributing
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 📄 License
+## Learn More
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+To learn more about Next.js, take a look at the following resources:
 
-## 🙏 Acknowledgments
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- [Radio Browser API](https://www.radio-browser.info/) for the radio station data
-- All the amazing open-source libraries used in this project.
-- leaftlet.js for the map.
----
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Made by [P0SSIBLE-0](https://github.com/P0SSIBLE-0)
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
