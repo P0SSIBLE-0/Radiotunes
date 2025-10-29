@@ -15,11 +15,14 @@ import {
 } from "lucide-react";
 import Filters from "./Filters";
 import Volume from "./Volume";
+import toast from 'react-hot-toast';
 
 const Player: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [time, setTime] = useState("");
  
+ 
+
 
   const {
     currentStation,
@@ -58,6 +61,14 @@ const Player: React.FC = () => {
     }
   }, [isExpanded]);
 
+  // Show error toast when errorFetchingStations changes
+  useEffect(() => {
+    console.log(errorFetchingStations);
+    if (!!errorFetchingStations) {
+      toast.error(errorFetchingStations);
+    }
+  }, [errorFetchingStations, toast]);
+
   if (!currentStation) {
     // A simple placeholder when no station is selected
     return (
@@ -69,16 +80,7 @@ const Player: React.FC = () => {
     );
   }
 
-  const ERROR_POPUP_VARIANTS: Variants = {
-    initial: { opacity: 0, y: 20, scale: 0.95 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { type: "spring", stiffness: 300, damping: 20 },
-    },
-    exit: { opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } },
-  };
+  
 
   const isFavorite = favoriteStationIds.includes(currentStation.stationuuid);
 
@@ -112,6 +114,7 @@ const Player: React.FC = () => {
     }
   };
 
+
   return (
     // This container holds both the Filters and the Player, managing their overall layout.
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 flex flex-col items-center gap-3 z-50">
@@ -129,26 +132,10 @@ const Player: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      {errorFetchingStations && (
-        <motion.div
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          variants={ERROR_POPUP_VARIANTS}
-          transition={{ duration: 0.2 }}
-          className="fixed bottom-21 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-50"
-        >
-          <div className="bg-red-500 border-2 border-red-100 rounded-xl p-2">
-            <p className="text-white text-center font-semibold">
-              {errorFetchingStations}
-            </p>
-          </div>
-        </motion.div>
-      )}
       {/* --- Main Player Container --- */}
       <motion.div
         layout="position"
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        transition={{ type: "spring", damping: 25, stiffness: 500, duration: 0.3 }}
         className="w-full bg-background backdrop-blur-xl border border-background/20 shadow-xl p-4"
         style={{
           borderRadius: isExpanded ? "24px" : "16px",

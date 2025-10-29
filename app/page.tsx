@@ -9,6 +9,7 @@ const LeafletMap = dynamic(() => import('@/components/MapView/LeafletMap'), {
   ssr: false,
 });
 import LoadingCounter from '@/components/LoadingCounter';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { fetchAndSetStations, isDarkMode , setInitialStationId,currentStation} = useAppStore();
@@ -54,6 +55,7 @@ function App() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
+      <Toaster/>
       <LeafletMap />
       <LoadingCounter />
       <SearchStations />

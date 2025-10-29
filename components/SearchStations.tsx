@@ -170,7 +170,7 @@ const SearchStations: React.FC = () => {
                       variants={itemVariants}
                       onMouseDown={() => handleSelectStation(station, index)}
                     >
-                      <div className="relative flex-shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                      <div className="relative shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                         {station.favicon ? (
                           <img
                             src={station.favicon}
