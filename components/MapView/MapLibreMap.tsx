@@ -242,16 +242,35 @@ const MapLibreMap: React.FC = () => {
         activeStationMarkerRef.current.remove();
       }
 
-      // Create a container for the marker to separate MapLibre's positioning (transform)
-      // from the inner element's CSS animation (which also uses transform).
+      // DOM Structure for Active Marker:
+      // 1. Container (Root): Created by us, passed to MapLibre. 0x0 size, relative.
+      //    MapLibre positions this element at the coordinate (transform: translate(...)).
       const container = document.createElement('div');
-      const inner = document.createElement('div');
-      inner.className = 'station-marker-active';
-      container.appendChild(inner);
+      container.style.width = '0px';
+      container.style.height = '0px';
+      container.style.position = 'relative';
+
+      // 2. Positioner: Absolute, centered within the Container.
+      //    We use this to center the marker visually (-50%, -50%).
+      //    We do this here instead of in the visual element to avoid conflict with CSS animations (scale).
+      const positioner = document.createElement('div');
+      positioner.style.position = 'absolute';
+      positioner.style.left = '0';
+      positioner.style.top = '0';
+      positioner.style.transform = 'translate(-50%, -50%)';
+
+      // 3. Visual: The actual visible marker element.
+      //    It has the class .station-marker-active (green dot, pulse animation).
+      //    The animation uses `transform: scale(...)`, which is why we need the separate positioner.
+      const visual = document.createElement('div');
+      visual.className = 'station-marker-active';
+
+      positioner.appendChild(visual);
+      container.appendChild(positioner);
 
       activeStationMarkerRef.current = new maplibregl.Marker({
         element: container,
-        anchor: 'center'
+        anchor: 'center' // MapLibre centers the container at the coordinate
       })
       .setLngLat(coords)
       .addTo(map);
