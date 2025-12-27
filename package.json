@@ -15,6 +15,7 @@
     "idb-keyval": "^6.2.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.548.0",
+    "maplibre-gl": "^5.15.0",
     "motion": "^12.23.24",
     "next": "16.0.10",
     "radio-browser-api": "^6.0.3",

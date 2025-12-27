@@ -19,8 +19,8 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   favicon: s.favicon,
   tags: typeof s.tags
     ? (s.tags as string[])
-        .map((t: any) => t.trim().toLowerCase())
-        .filter(Boolean)
+      .map((t: any) => t.trim().toLowerCase())
+      .filter(Boolean)
     : [],
   country: s.country,
   countrycode: s.countryCode,
@@ -28,9 +28,9 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   language:
     typeof s.language === "string"
       ? (s.language as string)
-          .split(",")
-          .map((t: any) => t.trim().toLowerCase())
-          .filter(Boolean)
+        .split(",")
+        .map((t: any) => t.trim().toLowerCase())
+        .filter(Boolean)
       : [],
   votes: s.votes,
   codec: s.codec,
