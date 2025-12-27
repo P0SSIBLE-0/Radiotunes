@@ -1,0 +1,123 @@
+
+> radio-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.0.2:3000
+   - Experiments (use with caution):
+     ✓ turbopackFileSystemCacheForDev
+
+ ✓ Starting...
+ ✓ Ready in 3s
+ ○ Compiling / ...
+ GET / 200 in 9.7s (compile: 9.2s, render: 479ms)
+ GET /api/radio/stations?limit=500&offset=0 200 in 1507ms (compile: 552ms, render: 955ms)
+ POST /api/radio/record-click 200 in 207ms (compile: 192ms, render: 15ms)
+ GET /api/radio/stations?limit=500&offset=500 200 in 420ms (compile: 5ms, render: 415ms)
+ GET /api/radio/stations?limit=500&offset=1000 200 in 428ms (compile: 6ms, render: 422ms)
+ GET /api/radio/stations?limit=500&offset=1500 200 in 385ms (compile: 6ms, render: 379ms)
+ GET /api/radio/stations?limit=500&offset=2000 200 in 401ms (compile: 5ms, render: 397ms)
+ GET /api/radio/stations?limit=500&offset=2500 200 in 397ms (compile: 3ms, render: 394ms)
+ GET /api/radio/stations?limit=500&offset=3000 200 in 414ms (compile: 4ms, render: 410ms)
+ GET /api/radio/stations?limit=500&offset=3500 200 in 445ms (compile: 3ms, render: 442ms)
+ GET /api/radio/stations?limit=500&offset=4000 200 in 487ms (compile: 3ms, render: 484ms)
+ GET /api/radio/stations?limit=500&offset=4500 200 in 437ms (compile: 2ms, render: 434ms)
+ GET /api/radio/stations?limit=500&offset=5000 200 in 322ms (compile: 2ms, render: 319ms)
+ GET /api/radio/stations?limit=500&offset=5500 200 in 336ms (compile: 2ms, render: 333ms)
+ GET /api/radio/stations?limit=500&offset=6000 200 in 291ms (compile: 3ms, render: 288ms)
+ GET /api/radio/stations?limit=500&offset=6500 200 in 351ms (compile: 3ms, render: 348ms)
+ GET /api/radio/stations?limit=500&offset=7000 200 in 422ms (compile: 2ms, render: 419ms)
+ GET /api/radio/stations?limit=500&offset=7500 200 in 429ms (compile: 2ms, render: 426ms)
+ GET /api/radio/stations?limit=500&offset=8000 200 in 293ms (compile: 2ms, render: 290ms)
+ GET /api/radio/stations?limit=500&offset=8500 200 in 336ms (compile: 3ms, render: 333ms)
+ POST /api/radio/record-click 200 in 11ms (compile: 3ms, render: 8ms)
+Response {
+  status: 502,
+  statusText: 'Bad Gateway',
+  headers: Headers {
+    server: 'nginx/1.24.0 (Ubuntu)',
+    date: 'Sat, 27 Dec 2025 16:06:30 GMT',
+    'content-type': 'text/html',
+    'content-length': '166',
+    connection: 'keep-alive'
+  },
+  body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+  bodyUsed: false,
+  ok: false,
+  redirected: false,
+  type: 'default',
+  url: 'https://de1.api.radio-browser.info/json/url/a374af5b-e187-4464-9706-387949baeae4'
+}
+Response {
+  status: 502,
+  statusText: 'Bad Gateway',
+  headers: Headers {
+    server: 'nginx/1.24.0 (Ubuntu)',
+    date: 'Sat, 27 Dec 2025 16:06:30 GMT',
+    'content-type': 'text/html',
+    'content-length': '166',
+    connection: 'keep-alive'
+  },
+  body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+  bodyUsed: false,
+  ok: false,
+  redirected: false,
+  type: 'default',
+  url: 'https://de1.api.radio-browser.info/json/url/0e5dfcc8-99e2-4fed-a232-7f4bf23ba3c3'
+}
+ GET / 200 in 84ms (compile: 11ms, render: 73ms)
+ GET /api/radio/stations?limit=500&offset=0 200 in 830ms (compile: 3ms, render: 827ms)
+ POST /api/radio/record-click 200 in 11ms (compile: 3ms, render: 9ms)
+ GET /api/radio/stations?limit=500&offset=500 200 in 301ms (compile: 2ms, render: 299ms)
+ GET /api/radio/stations?limit=500&offset=1000 200 in 289ms (compile: 3ms, render: 286ms)
+ GET /api/radio/stations?limit=500&offset=1500 200 in 289ms (compile: 2ms, render: 287ms)
+ GET /api/radio/stations?limit=500&offset=2000 200 in 288ms (compile: 3ms, render: 285ms)
+ GET /api/radio/stations?limit=500&offset=2500 200 in 284ms (compile: 2ms, render: 282ms)
+ GET /api/radio/stations?limit=500&offset=3000 200 in 336ms (compile: 4ms, render: 332ms)
+ GET /api/radio/stations?limit=500&offset=3500 200 in 347ms (compile: 8ms, render: 339ms)
+ GET /api/radio/stations?limit=500&offset=4000 200 in 310ms (compile: 7ms, render: 304ms)
+ GET /api/radio/stations?limit=500&offset=4500 200 in 327ms (compile: 4ms, render: 323ms)
+ GET /api/radio/stations?limit=500&offset=5000 200 in 207ms (compile: 7ms, render: 200ms)
+ GET /api/radio/stations?limit=500&offset=5500 200 in 212ms (compile: 5ms, render: 207ms)
+ GET /api/radio/stations?limit=500&offset=6000 200 in 322ms (compile: 5ms, render: 317ms)
+ GET /api/radio/stations?limit=500&offset=6500 200 in 228ms (compile: 4ms, render: 224ms)
+ GET /api/radio/stations?limit=500&offset=7000 200 in 608ms (compile: 6ms, render: 603ms)
+ GET /api/radio/stations?limit=500&offset=7500 200 in 324ms (compile: 5ms, render: 319ms)
+ GET /api/radio/stations?limit=500&offset=8000 200 in 317ms (compile: 5ms, render: 312ms)
+ GET /api/radio/stations?limit=500&offset=8500 200 in 188ms (compile: 4ms, render: 184ms)
+ POST /api/radio/record-click 200 in 20ms (compile: 4ms, render: 15ms)
+ GET / 200 in 119ms (compile: 10ms, render: 108ms)
+ GET /api/radio/stations?limit=500&offset=0 200 in 837ms (compile: 3ms, render: 835ms)
+ POST /api/radio/record-click 200 in 12ms (compile: 3ms, render: 9ms)
+ GET /api/radio/stations?limit=500&offset=500 200 in 300ms (compile: 3ms, render: 297ms)
+Response {
+  status: 502,
+  statusText: 'Bad Gateway',
+  headers: Headers {
+    server: 'nginx/1.24.0 (Ubuntu)',
+    date: 'Sat, 27 Dec 2025 16:14:23 GMT',
+    'content-type': 'text/html',
+    'content-length': '166',
+    connection: 'keep-alive'
+  },
+  body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+  bodyUsed: false,
+  ok: false,
+  redirected: false,
+  type: 'default',
+  url: 'https://de1.api.radio-browser.info/json/url/a374af5b-e187-4464-9706-387949baeae4'
+}
+ GET /api/radio/stations?limit=500&offset=1000 200 in 292ms (compile: 3ms, render: 289ms)
+ GET /api/radio/stations?limit=500&offset=1500 200 in 289ms (compile: 3ms, render: 286ms)
+ GET /api/radio/stations?limit=500&offset=2000 200 in 292ms (compile: 3ms, render: 289ms)
+ GET /api/radio/stations?limit=500&offset=2500 200 in 291ms (compile: 3ms, render: 288ms)
+ GET /api/radio/stations?limit=500&offset=3000 200 in 290ms (compile: 2ms, render: 288ms)
+ GET /api/radio/stations?limit=500&offset=3500 200 in 291ms (compile: 2ms, render: 289ms)
+ GET /api/radio/stations?limit=500&offset=4000 200 in 294ms (compile: 3ms, render: 291ms)
+ GET /api/radio/stations?limit=500&offset=4500 200 in 294ms (compile: 2ms, render: 292ms)
+ GET /api/radio/stations?limit=500&offset=5000 200 in 177ms (compile: 3ms, render: 175ms)
+ GET /api/radio/stations?limit=500&offset=5500 200 in 185ms (compile: 3ms, render: 182ms)
+ GET /api/radio/stations?limit=500&offset=6000 200 in 176ms (compile: 3ms, render: 173ms)
+ GET /api/radio/stations?limit=500&offset=6500 200 in 99ms (compile: 4ms, render: 94ms)
+[?25h

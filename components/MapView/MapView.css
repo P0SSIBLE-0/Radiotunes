@@ -15,24 +15,6 @@
     box-shadow: 0 0 0 0 rgba(38, 222, 129, 0);
   }
 }
-.leaflet-container {
-  width: 100%;
-  height: 100vh;
-  background-color: #f0f2f5;
-  outline: none;
-}
-.leaflet-marker-icon, 
-.leaflet-marker-shadow, 
-.leaflet-marker-pane * {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-/* Custom marker for the currently active/selected station */
-.marker-active {
-  transform: scale(1.5);
-  transition: transform 0.1s ease;
-  z-index: 1000 !important;
-}
 
 /* For the active station marker */
 .station-marker-active {
@@ -41,10 +23,22 @@
   background-color: #3bf657;
   border: 2px solid white;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); /* MapLibre anchor center handles centering, but this CSS was used with Leaflet divIcon which might behave differently. */
+  /* Actually MapLibre Marker 'center' anchor places the element's center at the coordinate.
+     If the element has size, we don't necessarily need translate -50% -50% if the maplibre marker logic handles it.
+     But let's test. MapLibre centers the element.
+     If I give it width/height, the center of that box is at the coord.
+     So translate might offset it wrongly?
+     Leaflet DivIcon top-left is at coordinate by default unless iconAnchor is set.
+     MapLibre default anchor is center.
+     So remove translate.
+  */
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
   animation: pulse 2s infinite;
+  display: block; /* Ensure it's block so width/height apply */
 }
+
+/* Tooltip styles if used by non-Leaflet tooltip */
 .station-tooltip {
   background-color: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(5px);
@@ -52,10 +46,6 @@
   border-radius: 12px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   padding: 8px 12px !important;
-}
-
-.station-tooltip .leaflet-tooltip-content {
-  white-space: nowrap;
 }
 
 .station-tooltip .tooltip-name {
@@ -71,19 +61,4 @@
   color: #636e72;
   margin: 0;
   padding: 0;
-}
-
-
-.station-marker-wrapper .station-marker-inner {
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50%;
-  will-change: transform;
-  transition: transform 0.2s ease-in-out;
-  cursor: pointer;
-}
-
-/* Add this rule as well for the hover effect */
-.station-marker-wrapper:hover .station-marker-inner {
-    transform: scale(1.2);
 }
