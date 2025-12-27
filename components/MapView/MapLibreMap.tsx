@@ -248,7 +248,7 @@ const MapLibreMap: React.FC = () => {
       const container = document.createElement('div');
       container.style.width = '0px';
       container.style.height = '0px';
-      container.style.position = 'relative';
+      container.style.position = 'absolute';
 
       // 2. Positioner: Absolute, centered within the Container.
       //    We use this to center the marker visually (-50%, -50%).
