@@ -3,30 +3,32 @@
 /* Keyframes for the pulsing animation on the active marker */
 @keyframes pulse {
   0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(38, 222, 129, 0.7);
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
   }
+
   70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 10px rgba(38, 222, 129, 0);
+    transform: scale(1.2);
+    box-shadow: 0 0 0 12px rgba(34, 197, 94, 0);
   }
+
   100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(38, 222, 129, 0);
+    transform: scale(0.9);
   }
 }
 
 /* For the active station marker */
 .station-marker-active {
-  width: 15px !important;
-  height: 15px !important;
+  width: 14px !important;
+  height: 14px !important;
   background-color: #3bf657;
   border: 2px solid white;
   border-radius: 50%;
   /* transform: translate(-50%, -50%); - Removed because MapLibre centers the marker container automatically */
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
   animation: pulse 2s infinite;
-  display: block; /* Ensure it's block so width/height apply */
+  display: block;
+  /* Ensure it's block so width/height apply */
 }
 
 /* Tooltip styles if used by non-Leaflet tooltip */

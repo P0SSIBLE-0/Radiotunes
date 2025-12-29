@@ -47,13 +47,11 @@ const MapLibreMap: React.FC = () => {
               type: "raster",
               tiles: ["https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"],
               tileSize: 256,
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             },
             "carto-dark": {
               type: "raster",
               tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"],
               tileSize: 256,
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
             },
             stations: {
               type: "geojson",
@@ -81,7 +79,13 @@ const MapLibreMap: React.FC = () => {
               type: "circle",
               source: "stations",
               paint: {
-                "circle-radius": 5,
+                "circle-radius": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  4, 4,
+                  8, 8
+                ],
                 "circle-color": "#000000",
                 "circle-stroke-width": 1,
                 "circle-stroke-color": "#FFFFFF",
@@ -101,7 +105,7 @@ const MapLibreMap: React.FC = () => {
         },
       });
 
-      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+      mapRef.current = map;
 
       map.on('load', () => {
         mapRef.current = map;
@@ -118,7 +122,7 @@ const MapLibreMap: React.FC = () => {
         mapRef.current = null;
       }
     };
-  }, []); // Run once on mount
+  }, []);
 
   // Handle Theme Changes (Basemap toggling and Station Colors)
   useEffect(() => {
@@ -233,7 +237,7 @@ const MapLibreMap: React.FC = () => {
       map.flyTo({
         center: coords,
         zoom: targetZoom,
-        speed: 1.5,
+        speed: 1,
         essential: true
       });
 
@@ -248,7 +252,7 @@ const MapLibreMap: React.FC = () => {
       const container = document.createElement('div');
       container.style.width = '0px';
       container.style.height = '0px';
-      container.style.position = 'absolute';
+      container.style.position = 'relative';
 
       // 2. Positioner: Absolute, centered within the Container.
       //    We use this to center the marker visually (-50%, -50%).
@@ -272,8 +276,8 @@ const MapLibreMap: React.FC = () => {
         element: container,
         anchor: 'center' // MapLibre centers the container at the coordinate
       })
-      .setLngLat(coords)
-      .addTo(map);
+        .setLngLat(coords)
+        .addTo(map);
 
     } else {
       if (activeStationMarkerRef.current) {
@@ -293,10 +297,10 @@ const MapLibreMap: React.FC = () => {
       />
 
       {(isLoadingStations && stationsOnMap.length === 0) && (
-         <div className="absolute inset-0 z-50 flex items-center justify-center dark:bg-zinc-900 bg-gray-50 dark:text-neutral-400 text-neutral-500">
-           <Loader2 className="animate-spin mr-2" size={20} />
-           <p className="text-lg font-semibold leading-1.5">Loading...</p>
-         </div>
+        <div className="absolute inset-0 z-50 flex items-center justify-center dark:bg-zinc-900 bg-gray-50 dark:text-neutral-400 text-neutral-500">
+          <Loader2 className="animate-spin mr-2" size={20} />
+          <p className="text-lg font-semibold leading-1.5">Loading...</p>
+        </div>
       )}
 
       <HoverTooltip info={hoverInfo} />

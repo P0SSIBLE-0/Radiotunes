@@ -5,14 +5,7 @@ const api = new RadioBrowserApi('My Radio App');
 // api.setBaseUrl('https://de1.api.radio-browser.info');
 api.setBaseUrl('https://fi1.api.radio-browser.info');
 
-
-const handleError = (error: any, message: string) => {
-  console.error(message, error);
-  return NextResponse.json({ error: message }, { status: 500 });
-};
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
+const fetchStations = async (searchParams: URLSearchParams) => {
   try {
     const limit = parseInt(searchParams.get('limit') || '500', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
@@ -26,6 +19,12 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(stations);
   } catch (error) {
-    return handleError(error, 'Failed to fetch stations');
+    console.log('error while fetching stations: ', error);
+    api.setBaseUrl('https://de2.api.radio-browser.info');
+    return fetchStations(searchParams);
   }
+}
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  return fetchStations(searchParams);
 }
