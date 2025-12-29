@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { RadioBrowserApi } from 'radio-browser-api';
 
 const api = new RadioBrowserApi('My Radio App');
-api.setBaseUrl('https://de1.api.radio-browser.info');
+api.setBaseUrl('https://fi1.api.radio-browser.info');
 
 const handleError = (error: any, message: string) => {
   console.error(message, error);

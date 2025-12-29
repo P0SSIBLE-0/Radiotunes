@@ -5,7 +5,7 @@ import SearchStations from '@/components/SearchStations';
 import { useAppStore } from '@/store/index';
 import dynamic from 'next/dynamic';
 
-const LeafletMap = dynamic(() => import('@/components/MapView/LeafletMap'), {
+const MapLibreMap = dynamic(() => import('@/components/MapView/MapLibreMap'), {
   ssr: false,
 });
 import LoadingCounter from '@/components/LoadingCounter';
@@ -56,7 +56,7 @@ function App() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-gray-100">
       <Toaster/>
-      <LeafletMap />
+      <MapLibreMap />
       <LoadingCounter />
       <SearchStations />
       {/* <Filters /> */}
