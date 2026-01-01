@@ -5,7 +5,7 @@ import type { Station } from '../types/radio.t';
 // Define constants for keys and cache duration for clarity and easy modification.
 const STATIONS_KEY = 'stations-data';
 const TIMESTAMP_KEY = 'stations-timestamp';
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
 
 export const setCachedStations = async (stations: Station[]): Promise<void> => {
   try {

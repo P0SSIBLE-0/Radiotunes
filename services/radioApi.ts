@@ -46,14 +46,12 @@ export async function fetchStations(
   limit: number = 500,
   offset: number = 0
 ): Promise<Station[]> {
-  console.log(`Fetching ${limit} stations with offset ${offset}...`);
   try {
     const response = await fetch(`/api/radio/stations?limit=${limit}&offset=${offset}`);
     if (!response.ok) {
       throw new Error('Failed to fetch stations');
     }
     const stationsFromServer: RadioApiStation[] = await response.json();
-    console.log("Raw stations fetched from server:", stationsFromServer.length);
 
     if (stationsFromServer.length === 0) {
       console.warn(
