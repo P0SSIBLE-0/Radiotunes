@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# maplibre worker files (copied from node_modules by predev/prebuild)
+public/maplibre/
+
 # vercel
 .vercel
 

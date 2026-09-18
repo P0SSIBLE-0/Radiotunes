@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAppStore } from "@/store/index";
-import { motion, AnimatePresence, Variants } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Play,
   Pause,
@@ -17,9 +17,15 @@ import Filters from "./Filters";
 import Volume from "./Volume";
 import toast from 'react-hot-toast';
 
+const getCurrentTime = () =>
+  new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
 const Player: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(getCurrentTime);
  
  
 
@@ -43,20 +49,8 @@ const Player: React.FC = () => {
   useEffect(() => {
     if (isExpanded) {
       const timer = setInterval(() => {
-        setTime(
-          new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })
-        );
+        setTime(getCurrentTime());
       }, 1000);
-      // Set initial time
-      setTime(
-        new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
       return () => clearInterval(timer);
     }
   }, [isExpanded]);
@@ -67,7 +61,7 @@ const Player: React.FC = () => {
     if (!!errorFetchingStations) {
       toast.error(errorFetchingStations);
     }
-  }, [errorFetchingStations, toast]);
+  }, [errorFetchingStations]);
 
   if (!currentStation) {
     // A simple placeholder when no station is selected
@@ -253,7 +247,7 @@ const Player: React.FC = () => {
               >
                 <Heart size={20} fill={isFavorite ? "red" : "none"} />
               </button>
-              <button onClick={() => setIsExpanded(true)} title="Expand">
+              <button onClick={() => { setTime(getCurrentTime()); setIsExpanded(true); }} title="Expand">
                 <Maximize2 size={20} />
               </button>
             </div>

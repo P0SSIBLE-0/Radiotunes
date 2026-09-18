@@ -19,7 +19,7 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   favicon: s.favicon,
   tags: typeof s.tags
     ? (s.tags as string[])
-      .map((t: any) => t.trim().toLowerCase())
+      .map((t: string) => t.trim().toLowerCase())
       .filter(Boolean)
     : [],
   country: s.country,
@@ -29,7 +29,7 @@ const mapApiStation = (s: RadioApiStation): Station => ({
     typeof s.language === "string"
       ? (s.language as string)
         .split(",")
-        .map((t: any) => t.trim().toLowerCase())
+        .map((t: string) => t.trim().toLowerCase())
         .filter(Boolean)
       : [],
   votes: s.votes,
@@ -60,9 +60,9 @@ export async function fetchStations(
     }
 
     return stationsFromServer.map(mapApiStation);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching stations:", error);
-    throw new Error(`Failed to fetch stations: ${error.message}`);
+    throw new Error(`Failed to fetch stations: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 

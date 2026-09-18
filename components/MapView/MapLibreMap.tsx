@@ -1,13 +1,24 @@
 // src/components/MapView/MapLibreMap.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
+import type * as GeoJSON from "geojson";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useAppStore } from "@/store";
 import type { Station } from "@/types/radio.t";
 import HoverTooltip from "./HoverTooltip";
 import { Loader2 } from "lucide-react";
 import "./MapView.css";
+
+// MapLibre v6 requires bundler users (Next.js/Turbopack) to point at a
+// self-hosted worker. The files are copied from node_modules to
+// public/maplibre by scripts/copy-maplibre-worker.mjs (predev/prebuild).
+maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
+
+const CARTO_API_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+
+const cartoTiles = (style: "light_all" | "dark_all") =>
+  `https://basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`;
 
 const MapLibreMap: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +47,13 @@ const MapLibreMap: React.FC = () => {
     if (mapRef.current) return;
     if (!mapContainerRef.current) return;
 
+    if (!CARTO_API_KEY) {
+      console.error(
+        "MapLibreMap: Missing NEXT_PUBLIC_CARTO_API_KEY. " +
+          "Get a free key at https://carto.com/basemaps/apikey and add it to your .env file."
+      );
+    }
+
     let map: maplibregl.Map;
     try {
       map = new maplibregl.Map({
@@ -45,12 +63,12 @@ const MapLibreMap: React.FC = () => {
           sources: {
             "carto-light": {
               type: "raster",
-              tiles: ["https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"],
+              tiles: [cartoTiles("light_all")],
               tileSize: 256,
             },
             "carto-dark": {
               type: "raster",
-              tiles: ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"],
+              tiles: [cartoTiles("dark_all")],
               tileSize: 256,
             },
             stations: {

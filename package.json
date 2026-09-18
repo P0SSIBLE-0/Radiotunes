@@ -4,35 +4,38 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "node ./scripts/copy-maplibre-worker.mjs",
     "build": "next build",
+    "prebuild": "node ./scripts/copy-maplibre-worker.mjs",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "axios": "^1.13.0",
+    "axios": "^1.20.0",
     "clsx": "^2.1.1",
     "howler": "^2.2.4",
-    "idb-keyval": "^6.2.2",
-    "lucide-react": "^0.548.0",
-    "maplibre-gl": "^5.15.0",
-    "motion": "^12.23.24",
-    "next": "16.0.10",
+    "idb-keyval": "^6.3.0",
+    "lucide-react": "^1.47.0",
+    "maplibre-gl": "^6.10.0",
+    "motion": "^13.4.0",
+    "next": "16.3.5",
     "radio-browser-api": "^6.0.3",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-hot-toast": "^2.6.0",
-    "tailwind-merge": "^3.3.1",
-    "zustand": "^5.0.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hot-toast": "^2.6.1",
+    "tailwind-merge": "^3.7.0",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/howler": "^2.2.12",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.0",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/geojson": "^7946.0.16",
+    "@types/howler": "^2.2.13",
+    "@types/node": "^26.6.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "16.3.5",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
   }
 }

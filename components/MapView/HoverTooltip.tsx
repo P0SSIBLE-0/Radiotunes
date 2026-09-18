@@ -1,6 +1,6 @@
 // src/components/MapView/HoverTooltip.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'motion/react';
 import { Radio } from 'lucide-react';
 import type { Station } from '@/types/radio.t.ts';
@@ -13,21 +13,22 @@ interface HoverTooltipProps {
   } | null;
 }
 
+const StationImage: React.FC<{ src: string; alt: string }> = ({ src, alt }) => {
+  const [failed, setFailed] = useState(false);
+  if (failed) {
+    return <Radio className="size-6 m-auto" />;
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className="w-full h-full object-cover rounded-xl"
+      onError={() => setFailed(true)}
+    />
+  );
+};
+
 const HoverTooltip: React.FC<HoverTooltipProps> = ({ info }) => {
-  const [showFallbackIcon, setShowFallbackIcon] = useState(false);
-
-  useEffect(() => {
-    // Reset the fallback state whenever the hovered station changes
-    if (info?.station.favicon) {
-      setShowFallbackIcon(false);
-    } else {
-      setShowFallbackIcon(true);
-    }
-  }, [info]);
-
-  const handleImageError = () => {
-    setShowFallbackIcon(true);
-  };
 
   const tooltipVariants: Variants = {
     hidden: { opacity: 0, y: 10, scale: 0.95 },
@@ -53,12 +54,11 @@ const HoverTooltip: React.FC<HoverTooltipProps> = ({ info }) => {
           exit="exit"
         >
           <div className="size-10 overflow-hidden rounded-xl flex items-center justify-center">
-            {!showFallbackIcon && info.station.favicon ? (
-              <img
+            {info.station.favicon ? (
+              <StationImage
+                key={info.station.favicon}
                 src={info.station.favicon}
                 alt={info.station.name}
-                className="w-full h-full object-cover rounded-xl"
-                onError={handleImageError}
               />
             ) : (
               <Radio className="size-6 m-auto" />

@@ -67,12 +67,11 @@ export const createStationSlice: StateCreator<
       set({ isLoadingStations: true, errorFetchingStations: null });
     }
 
-    const CHUNK_SIZE = 500;
+    const CHUNK_SIZE = 1000;
     let isFirstChunk = get().stations.length === 0;
 
     try {
       // Loop to fetch stations in chunks until the API returns an empty/small chunk
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const currentOffset = get().stations.length;
         const chunk = await fetchStations(CHUNK_SIZE, currentOffset);

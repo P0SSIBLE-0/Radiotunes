@@ -6,11 +6,11 @@ import { Radio } from "lucide-react";
 interface GeoJsonFeature {
   type: string;
   properties: {
-    [key: string]: any;
+    [key: string]: unknown;
   };
   geometry: {
     type: string;
-    coordinates: any;
+    coordinates: unknown;
   };
 }
 

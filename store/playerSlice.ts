@@ -87,7 +87,11 @@ export const createPlayerSlice: StateCreator<
   },
 
   togglePlayPause: () => {
-    get().isPlaying ? get().pause() : get().play();
+    if (get().isPlaying) {
+      get().pause();
+    } else {
+      get().play();
+    }
   },
 
   playNextStation: () => {
