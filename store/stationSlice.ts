@@ -1,11 +1,44 @@
 import type { StateCreator } from "zustand";
-import type { RadioState, Station } from "@/types/radio.t.ts";
+import type { Mood, RadioState, Station } from "@/types/radio.t.ts";
 import { getCachedStations, setCachedStations } from "@/utils/cache";
+import { stationMatchesMood } from "@/utils/moods";
 import {
   fetchStations,
   fetchGenres as fetchGenresApi,
 } from "@/services/radioApi";
 import type { StationSlice } from "@/types/radio.t.ts";
+
+type SliceSet = Parameters<
+  StateCreator<RadioState, [], [], StationSlice>
+>[0];
+type SliceGet = Parameters<
+  StateCreator<RadioState, [], [], StationSlice>
+>[1];
+
+// Single place where stationsOnMap is derived: genre filter first,
+// then mood filter. Genre and mood are mutually exclusive (selecting one
+// clears the other), so in practice only one applies at a time.
+const applyFilters = (get: SliceGet, set: SliceSet) => {
+  const { stations, selectedGenre, selectedMood, favoriteStationIds } = get();
+
+  let filtered = stations;
+  if (selectedGenre === "Favorites") {
+    filtered = filtered.filter((station) =>
+      favoriteStationIds.includes(station.stationuuid)
+    );
+  } else if (selectedGenre && selectedGenre !== "All") {
+    const genreToFilter = selectedGenre.toLowerCase();
+    filtered = filtered.filter((station) =>
+      station.tags.some((tag) => tag.toLowerCase() === genreToFilter)
+    );
+  }
+  if (selectedMood) {
+    filtered = filtered.filter((station) =>
+      stationMatchesMood(station, selectedMood)
+    );
+  }
+  set({ stationsOnMap: filtered });
+};
 
 export const createStationSlice: StateCreator<
   RadioState,
@@ -19,6 +52,7 @@ export const createStationSlice: StateCreator<
   errorFetchingStations: null,
   genres: [],
   selectedGenre: "All",
+  selectedMood: null,
   allStationsLoaded: false,
 
   fetchAndSetStations: async (autoSelectFirst = false) => {
@@ -69,6 +103,7 @@ export const createStationSlice: StateCreator<
 
     const CHUNK_SIZE = 1000;
     let isFirstChunk = get().stations.length === 0;
+    set({ selectedGenre: "All" });
 
     try {
       // Loop to fetch stations in chunks until the API returns an empty/small chunk
@@ -81,7 +116,6 @@ export const createStationSlice: StateCreator<
           stations: [...state.stations, ...chunk],
           stationsOnMap: [...state.stationsOnMap, ...chunk],
         }));
-        set({ selectedGenre: "All" });
 
         // If this was the very first chunk, update the main loading state and auto-select a station
         if (isFirstChunk) {
@@ -122,31 +156,18 @@ export const createStationSlice: StateCreator<
   },
 
   setSelectedGenre: (genre: string | null) => {
-    set({ selectedGenre: genre });
+    // Genre and mood are mutually exclusive filters.
+    set({ selectedGenre: genre, selectedMood: null });
+    get().filterStationsByGenre();
+  },
+
+  setSelectedMood: (mood: Mood | null) => {
+    // Genre and mood are mutually exclusive filters.
+    set({ selectedMood: mood, selectedGenre: "All" });
     get().filterStationsByGenre();
   },
 
   filterStationsByGenre: () => {
-    const { stations, selectedGenre, favoriteStationIds } = get();
-
-    if (selectedGenre === "Favorites") {
-      const favoriteStations = stations.filter((station) =>
-        favoriteStationIds.includes(station.stationuuid)
-      );
-      set({ stationsOnMap: favoriteStations });
-      return;
-    }
-    // If "All" is selected or no genre is chosen, show all stations
-    if (!selectedGenre || selectedGenre === "All") {
-      set({ stationsOnMap: stations });
-      return;
-    }
-
-    const genreToFilter = selectedGenre.toLowerCase();
-
-    const filtered = stations.filter((station) =>
-      station.tags.some((tag) => tag.toLowerCase() === genreToFilter)
-    );
-    set({ stationsOnMap: filtered });
+    applyFilters(get, set);
   },
 });

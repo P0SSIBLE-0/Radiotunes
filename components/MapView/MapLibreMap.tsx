@@ -1,11 +1,11 @@
 // src/components/MapView/MapLibreMap.tsx
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import type * as GeoJSON from "geojson";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useAppStore } from "@/store";
-import type { Station } from "@/types/radio.t";
+import type { StationPreview } from "@/types/radio.t";
 import HoverTooltip from "./HoverTooltip";
 import { Loader2 } from "lucide-react";
 import "./MapView.css";
@@ -25,22 +25,52 @@ const MapLibreMap: React.FC = () => {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const activeStationMarkerRef = useRef<maplibregl.Marker | null>(null);
 
-  const {
-    stationsOnMap,
-    currentStation,
-    isDarkMode,
-    selectStation,
-    play,
-    isLoadingStations,
-    locateStationTrigger,
-  } = useAppStore();
+  // Granular subscriptions so unrelated store updates (volume, playback, …)
+  // don't re-render the map.
+  const stationsOnMap = useAppStore((s) => s.stationsOnMap);
+  const currentStation = useAppStore((s) => s.currentStation);
+  const isDarkMode = useAppStore((s) => s.isDarkMode);
+  const isLoadingStations = useAppStore((s) => s.isLoadingStations);
+  const locateStationTrigger = useAppStore((s) => s.locateStationTrigger);
+  const selectStation = useAppStore((s) => s.selectStation);
+  const play = useAppStore((s) => s.play);
 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [hoverInfo, setHoverInfo] = useState<{
-    station: Station;
+    station: StationPreview;
     x: number;
     y: number;
   } | null>(null);
+
+  // Mirror of stationsOnMap for map event handlers, so they can stay
+  // registered instead of being torn down on every data update.
+  const stationsRef = useRef(stationsOnMap);
+  useEffect(() => {
+    stationsRef.current = stationsOnMap;
+  }, [stationsOnMap]);
+
+  // Memoized GeoJSON features: rebuilt only when the station list changes,
+  // not on unrelated re-renders. Properties carry just the fields the map
+  // UI needs to keep worker messages small (13k+ stations).
+  const stationFeatures: GeoJSON.Feature[] = useMemo(
+    () =>
+      stationsOnMap
+        .filter((s) => s.geo_lat != null && s.geo_long != null)
+        .map((s) => ({
+          type: "Feature" as const,
+          geometry: {
+            type: "Point" as const,
+            coordinates: [Number(s.geo_long), Number(s.geo_lat)],
+          },
+          properties: {
+            stationuuid: s.stationuuid,
+            name: s.name,
+            country: s.country,
+            favicon: s.favicon,
+          },
+        })),
+    [stationsOnMap]
+  );
 
   // Initialize Map
   useEffect(() => {
@@ -171,25 +201,12 @@ const MapLibreMap: React.FC = () => {
     if (!mapLoaded || !mapRef.current) return;
     const map = mapRef.current;
 
-    const source = map.getSource("stations") as maplibregl.GeoJSONSource;
-    if (source) {
-      const features = stationsOnMap
-        .filter((s) => s.geo_lat != null && s.geo_long != null)
-        .map((s) => ({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [Number(s.geo_long), Number(s.geo_lat)],
-          },
-          properties: s as unknown as Record<string, unknown>,
-        }));
-
-      source.setData({
-        type: "FeatureCollection",
-        features: features as unknown as GeoJSON.Feature[],
-      });
-    }
-  }, [stationsOnMap, mapLoaded]);
+    const source = map.getSource("stations") as maplibregl.GeoJSONSource | undefined;
+    source?.setData({
+      type: "FeatureCollection",
+      features: stationFeatures,
+    });
+  }, [stationFeatures, mapLoaded]);
 
   // Handle Interactions (Hover, Click)
   useEffect(() => {
@@ -200,7 +217,7 @@ const MapLibreMap: React.FC = () => {
       map.getCanvas().style.cursor = 'pointer';
       if (e.features && e.features.length > 0) {
         const feature = e.features[0];
-        const station = feature.properties as unknown as Station;
+        const station = feature.properties as unknown as StationPreview;
         setHoverInfo({
           station,
           x: e.point.x,
@@ -217,11 +234,11 @@ const MapLibreMap: React.FC = () => {
     const onClick = (e: maplibregl.MapLayerMouseEvent) => {
       if (e.features && e.features.length > 0) {
         const feature = e.features[0];
-        const station = feature.properties as unknown as Station;
+        const station = feature.properties as unknown as StationPreview;
 
         // Find in store to get consistent object/index
-        const stationIndex = stationsOnMap.findIndex(s => s.stationuuid === station.stationuuid);
-        const realStation = stationsOnMap[stationIndex];
+        const stationIndex = stationsRef.current.findIndex(s => s.stationuuid === station.stationuuid);
+        const realStation = stationsRef.current[stationIndex];
 
         if (realStation) {
           selectStation(realStation, stationIndex);
@@ -239,7 +256,7 @@ const MapLibreMap: React.FC = () => {
       map.off('mouseleave', 'stations-layer', onMouseLeave);
       map.off('click', 'stations-layer', onClick);
     };
-  }, [mapLoaded, stationsOnMap, selectStation, play]);
+  }, [mapLoaded, selectStation, play]);
 
   // Handle FlyTo and Active Marker
   useEffect(() => {

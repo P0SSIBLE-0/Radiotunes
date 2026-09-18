@@ -26,16 +26,14 @@ const SearchStations: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false);
   // selectedStationId was unused, so it's removed.
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const { 
-    searchStations, 
-    filteredStations, 
-    isSearching, 
-    currentStation,
-    play,
-    pause,
-    isPlaying,
-    selectStation
-  } = useAppStore();
+  const searchStations = useAppStore((s) => s.searchStations);
+  const filteredStations = useAppStore((s) => s.filteredStations);
+  const isSearching = useAppStore((s) => s.isSearching);
+  const currentStation = useAppStore((s) => s.currentStation);
+  const isPlaying = useAppStore((s) => s.isPlaying);
+  const play = useAppStore((s) => s.play);
+  const pause = useAppStore((s) => s.pause);
+  const selectStation = useAppStore((s) => s.selectStation);
 
   // Handle search when debounced query changes
   useEffect(() => {

@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'motion/react';
 import { Radio } from 'lucide-react';
-import type { Station } from '@/types/radio.t.ts';
+import type { StationPreview } from '@/types/radio.t.ts';
 
 interface HoverTooltipProps {
   info: {
-    station: Station;
+    station: StationPreview;
     x: number;
     y: number;
   } | null;

@@ -6,24 +6,19 @@ import { Howl } from "howler";
 interface VolumeProps {
   currentSound: Howl | null;
   setVolume: (volume: number) => void;
+  /** Store volume in the 0–1 range. Used to initialize the slider. */
+  volume: number;
 }
-const Volume = ({ currentSound, setVolume }: VolumeProps) => {
+const Volume = ({ currentSound, setVolume, volume }: VolumeProps) => {
   const [showVolumeControl, setShowVolumeControl] = useState(false);
-  const [currentVolume, setCurrentVolume] = useState(10); // 0 to 1 range
+  // Slider scale is 0–10; store scale is 0–1.
+  const [currentVolume, setCurrentVolume] = useState(() => Math.round(volume * 10));
   const handleVolumeChange = (newVolume: number) => {
     if (!currentSound) return;
-    const volume = Math.max(1, Math.min(10, newVolume)); // Ensure volume is between 1 and 10
-    setCurrentVolume(volume);
-    setVolume(volume / 10); // Convert to 0-1 range for Howler
+    const sliderValue = Math.max(0, Math.min(10, newVolume));
+    setCurrentVolume(sliderValue);
+    setVolume(sliderValue / 10);
   };
-
-  // Update the toggleMute function
-  // const toggleMute = () => {
-  //   if (!currentSound) return;
-  //   const newVolume = currentVolume > 1 ? 1 : 10; // Toggle between min (1) and max (10)
-  //   setCurrentVolume(newVolume);
-  //   setVolume(newVolume / 10); // Convert to 0-1 range for Howler
-  // };
 
 
   return (
@@ -52,7 +47,7 @@ const Volume = ({ currentSound, setVolume }: VolumeProps) => {
         >
           <input
             type="range"
-            min="1"
+            min="0"
             max="10"
             step="1"
             value={currentVolume}

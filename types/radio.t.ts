@@ -26,6 +26,13 @@ export interface Station {
   geo_long?: number | null;
 }
 
+// Slim station shape stored in map feature properties.
+// Only the fields the map UI needs — keeps worker messages small for 13k+ features.
+export type StationPreview = Pick<
+  Station,
+  "stationuuid" | "name" | "country" | "favicon"
+>;
+
 
 export type RadioState = StationSlice & PlayerSlice & UserSlice;
 // Common moods that can be used for filtering
@@ -37,18 +44,19 @@ export const MOODS = [
 
 export type Mood = typeof MOODS[number];
 
-export interface StationSlice {
-  stations: Station[];
+export interface StationSlice {  stations: Station[];
   stationsOnMap: Station[];
   isLoadingStations: boolean;
   allStationsLoaded: boolean;
   errorFetchingStations: string | null;
   genres: string[];
   selectedGenre: string | null;
+  selectedMood: Mood | null;
   fetchAndSetStations: (autoSelectFirst?: boolean) => Promise<void>;
   fetchGenres: () => Promise<void>;
   filterStationsByGenre: () => void;
   setSelectedGenre: (genre: string | null) => void;
+  setSelectedMood: (mood: Mood | null) => void;
 }
 
 export interface PlayerSlice {

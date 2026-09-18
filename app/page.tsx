@@ -12,7 +12,10 @@ import LoadingCounter from '@/components/LoadingCounter';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const { fetchAndSetStations, isDarkMode , setInitialStationId,currentStation} = useAppStore();
+  const fetchAndSetStations = useAppStore((s) => s.fetchAndSetStations);
+  const setInitialStationId = useAppStore((s) => s.setInitialStationId);
+  const isDarkMode = useAppStore((s) => s.isDarkMode);
+  const currentStation = useAppStore((s) => s.currentStation);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);

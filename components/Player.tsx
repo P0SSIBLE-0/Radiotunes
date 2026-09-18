@@ -26,24 +26,23 @@ const getCurrentTime = () =>
 const Player: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [time, setTime] = useState(getCurrentTime);
- 
- 
 
 
-  const {
-    currentStation,
-    isPlaying,
-    isLoading,
-    togglePlayPause,
-    playRandomStation,
-    locateCurrentStation,
-    errorFetchingStations,
-    toggleDarkMode,
-    toggleFavorite,
-    favoriteStationIds,
-    currentSound,
-    setVolume,
-  } = useAppStore();
+
+
+  const currentStation = useAppStore((s) => s.currentStation);
+  const isPlaying = useAppStore((s) => s.isPlaying);
+  const isLoading = useAppStore((s) => s.isLoading);
+  const errorFetchingStations = useAppStore((s) => s.errorFetchingStations);
+  const favoriteStationIds = useAppStore((s) => s.favoriteStationIds);
+  const currentSound = useAppStore((s) => s.currentSound);
+  const togglePlayPause = useAppStore((s) => s.togglePlayPause);
+  const playRandomStation = useAppStore((s) => s.playRandomStation);
+  const locateCurrentStation = useAppStore((s) => s.locateCurrentStation);
+  const toggleDarkMode = useAppStore((s) => s.toggleDarkMode);
+  const toggleFavorite = useAppStore((s) => s.toggleFavorite);
+  const setVolume = useAppStore((s) => s.setVolume);
+  const volume = useAppStore((s) => s.volume);
 
   // Effect for the live clock in the expanded view
   useEffect(() => {
@@ -74,7 +73,7 @@ const Player: React.FC = () => {
     );
   }
 
-  
+
 
   const isFavorite = favoriteStationIds.includes(currentStation.stationuuid);
 
@@ -130,7 +129,7 @@ const Player: React.FC = () => {
       <motion.div
         layout="position"
         transition={{ type: "spring", damping: 25, stiffness: 550, duration: 0.3 }}
-        className="w-full bg-background backdrop-blur-xl border border-background/20 shadow-xl p-4"
+        className="w-full bg-linear-to-br from-background/90 via-background/750 to-primary/5 backdrop-blur-lg -border-2 border-background/10 shadow-xl p-4"
         style={{
           borderRadius: isExpanded ? "24px" : "16px",
         }}
@@ -185,7 +184,7 @@ const Player: React.FC = () => {
                   </motion.div>
                 )}
               </button>
-              <Volume currentSound={currentSound} setVolume={setVolume} />
+              <Volume currentSound={currentSound} setVolume={setVolume} volume={volume} />
               <button
                 title={
                   isFavorite ? "Remove from favorites" : "Add to favorites"
@@ -237,7 +236,7 @@ const Player: React.FC = () => {
                   </motion.div>
                 )}
               </button>
-              <Volume currentSound={currentSound} setVolume={setVolume} />
+              <Volume currentSound={currentSound} setVolume={setVolume} volume={volume} />
               <button
                 title={
                   isFavorite ? "Remove from favorites" : "Add to favorites"

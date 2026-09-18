@@ -7,6 +7,24 @@ type Tag = {
   stationcount: number;
 };
 
+// The library sometimes returns tag/language lists in mixed shapes;
+// normalize to a clean lowercase string array.
+const toTagList = (value: unknown): string[] => {
+  const list = Array.isArray(value) ? value : String(value ?? "").split(",");
+  return list
+    .map((t) => String(t).trim().toLowerCase())
+    .filter(Boolean);
+};
+
+// Shared fetch boilerplate: throws on HTTP errors, parses JSON.
+async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init);
+  if (!response.ok) {
+    throw new Error(`Request failed (${response.status}): ${url}`);
+  }
+  return response.json() as Promise<T>;
+}
+
 
 // Helper function to map API station to our app's Station interface
 const mapApiStation = (s: RadioApiStation): Station => ({
@@ -17,25 +35,15 @@ const mapApiStation = (s: RadioApiStation): Station => ({
   url_resolved: s.urlResolved,
   homepage: s.homepage,
   favicon: s.favicon,
-  tags: typeof s.tags
-    ? (s.tags as string[])
-      .map((t: string) => t.trim().toLowerCase())
-      .filter(Boolean)
-    : [],
+  tags: toTagList(s.tags),
   country: s.country,
   countrycode: s.countryCode,
   state: s.state,
-  language:
-    typeof s.language === "string"
-      ? (s.language as string)
-        .split(",")
-        .map((t: string) => t.trim().toLowerCase())
-        .filter(Boolean)
-      : [],
+  language: toTagList(s.language),
   votes: s.votes,
   codec: s.codec,
   bitrate: s.bitrate,
-  hls: s.hls === !!1,
+  hls: s.hls,
   lastcheckok: s.lastCheckOk,
   clickcount: s.clickCount,
   geo_lat: s.geoLat,
@@ -47,11 +55,9 @@ export async function fetchStations(
   offset: number = 0
 ): Promise<Station[]> {
   try {
-    const response = await fetch(`/api/radio/stations?limit=${limit}&offset=${offset}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch stations');
-    }
-    const stationsFromServer: RadioApiStation[] = await response.json();
+    const stationsFromServer = await fetchJson<RadioApiStation[]>(
+      `/api/radio/stations?limit=${limit}&offset=${offset}`
+    );
 
     if (stationsFromServer.length === 0) {
       console.warn(
@@ -92,11 +98,7 @@ export async function recordStationClick(stationUuid: string): Promise<void> {
 export const fetchGenres = async (): Promise<string[]> => {
   console.log("Fetching, sorting, and cleaning genres...");
   try {
-    const response = await fetch('/api/radio/genres');
-    if (!response.ok) {
-      throw new Error('Failed to fetch genres');
-    }
-    const tags: Tag[] = await response.json();
+    const tags = await fetchJson<Tag[]>('/api/radio/genres');
 
     const sortedTags = tags.sort((a, b) => b.stationcount - a.stationcount);
 
@@ -127,11 +129,9 @@ export const searchStations = async (query: string): Promise<Station[]> => {
 
   console.log(`Searching stations for: "${query}"`);
   try {
-    const response = await fetch(`/api/radio/search?query=${encodeURIComponent(query)}`);
-    if (!response.ok) {
-      throw new Error('Failed to search stations');
-    }
-    const stations: RadioApiStation[] = await response.json();
+    const stations = await fetchJson<RadioApiStation[]>(
+      `/api/radio/search?query=${encodeURIComponent(query)}`
+    );
 
     console.log(`Found ${stations.length} stations for query: "${query}"`);
     return stations.map(mapApiStation);
